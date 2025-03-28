@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puntod Finder</title>
+    <style>
+        /* Body styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('images/Grass Open View.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* Header styling */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Logo styling */
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #fff;
+        }
+        .logo img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        /* Navigation menu styling */
+        nav {
+            display: flex;
+            gap: 15px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Main content area styling */
+        .main-content {
+            height: calc(100vh - 70px); /* Full height minus header height */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Contact information section styling */
+        .contact-info {
+            text-align: left;
+            max-width: 40%;
+        }
+        .contact-info h2 {
+            margin-bottom: 20px;
+        }
+        .contact-info p {
+            margin: 10px 0;
+        }
+
+        /* Contact form section styling */
+        .contact-form {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 50%;
+            text-align: left;
+        }
+        .contact-form h2 {
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .contact-form label {
+            display: block;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+        }
+        .contact-form button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .contact-form button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header section -->
+    <header>
+        <!-- Logo with link to homepage -->
+        <a href="index.html" class="logo">
+            <img src="images/handsomeShrek.jpg" alt="Puntod Finder Logo">
+            <span>Puntod Finder</span>
+        </a>
+        <!-- Navigation menu -->
+        <nav>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <!-- Main content section -->
+    <div class="main-content">
+        <!-- Contact information section -->
+        <div class="contact-info">
+            <h2>Contact Information</h2>
+            <p><strong>Email:</strong> example@puntodfinder.com</p>
+            <p><strong>Phone:</strong> +123 456 7890</p>
+            <p><strong>Telephone:</strong> +123 456 7891</p>
+            <p><strong>Office Address:</strong> 123 Puntod Street, City, Country</p>
+        </div>
+
+        <!-- Contact form section -->
+        <div class="contact-form">
+            <h2>Contact Us</h2>
+            <form action="#" method="post">
+                <!-- Name input -->
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Your Name" required>
+
+                <!-- Email input -->
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Your Email" required>
+
+                <!-- Subject input -->
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" placeholder="Subject" required>
+
+                <!-- Message textarea -->
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="5" placeholder="Your Message" required style="resize: none; overflow-y: auto;"></textarea>
+
+                <!-- Submit button -->
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

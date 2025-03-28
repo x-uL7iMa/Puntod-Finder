@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puntod Finder</title>
+    <style>
+        /* General body styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('images/Front Gate View.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* Header styling */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Logo styling */
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #fff;
+        }
+        .logo img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        /* Navigation menu styling */
+        nav {
+            display: flex;
+            gap: 15px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Main content area styling */
+        .main-content {
+            height: calc(100vh - 70px); /* Full height minus header height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Find button styling */
+        .find-button {
+            padding: 15px 30px;
+            font-size: 20px;
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .find-button:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header section -->
+    <header>
+        <!-- Logo with link to homepage -->
+        <a href="index.html" class="logo">
+            <img src="images/handsomeShrek.jpg" alt="Puntod Finder Logo">
+            <span>Puntod Finder</span>
+        </a>
+        <!-- Navigation menu -->
+        <nav>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <!-- Main content section -->
+    <div class="main-content">
+        <!-- Button linking to the map page -->
+        <a href="map.html" class="find-button">Find Puntod</a>
+    </div>
+</body>
+</html>
