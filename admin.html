@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puntod Finder</title>
+    <title>Admin Page</title>
     <style>
-        /* General body styling */
+        /* General Styles */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -15,7 +15,7 @@
             text-align: center;
         }
 
-        /* Header styling */
+        /* Header Styles */
         header {
             display: flex;
             justify-content: space-between;
@@ -24,7 +24,7 @@
             background-color: rgba(0, 0, 0, 0.5);
         }
 
-        /* Logo styling */
+        /* Logo Styles */
         .logo {
             display: flex;
             align-items: center;
@@ -36,7 +36,7 @@
             margin-right: 10px;
         }
 
-        /* Navigation menu styling */
+        /* Navigation Styles */
         nav {
             display: flex;
             gap: 15px;
@@ -53,7 +53,7 @@
             background-color: rgba(255, 255, 255, 0.4);
         }
 
-        /* Main content area styling */
+        /* Main Content Styles */
         .main-content {
             height: calc(100vh - 70px); /* Full height minus header height */
             display: flex;
@@ -61,7 +61,7 @@
             align-items: center;
         }
 
-        /* Find button styling */
+        /* Button Styles */
         .find-button {
             padding: 15px 30px;
             font-size: 20px;
@@ -79,230 +79,99 @@
     </style>
 </head>
 <body>
-    <!-- Header section -->
+    <!-- Header Section -->
     <header>
-        <!-- Logo with link to homepage -->
+        <!-- Logo -->
         <a href="index.html" class="logo">
             <img src="images/handsomeShrek.jpg" alt="Puntod Finder Logo">
             <span>Puntod Finder</span>
         </a>
-        <!-- Navigation menu -->
+        <!-- Navigation -->
         <nav>
             <a href="about.html">About Us</a>
             <a href="contact.html">Contact</a>
             <a href="admin.html">Admin</a>
         </nav>
     </header>
-
-    <!-- Main content section -->
+    <!-- Main Content Section -->
     <div class="main-content">
-        
-    <div class="database-container">
-        <!-- Categories Section -->
-        <div class="categories">
-            <button class="category-button" title="View information about deceased individuals" onclick="showTable('deceased')">Deceased</button>
-            <button class="category-button" title="View information about burial spots" onclick="showTable('burial')">Burial Spots</button>
-            <button class="category-button" title="View messages submitted by users" onclick="showTable('messages')">Messages</button>
-        </div>
-
-        <!-- Table Section -->
-        <div class="table-section">
-            <!-- Sorting Dropdown -->
-            <div class="sorting">
-                <label for="sort-options">Sort By:</label>
-                <select id="sort-options" onchange="sortTable()">
-                    <option value="default">Default</option>
-                    <option value="name">Name</option>
-                    <option value="date">Date</option>
-                </select>
+        <div class="database-container">
+            <!-- Categories Section -->
+            <div class="categories">
+                <button class="category-button" onclick="showTable('deceased')" title="View deceased records">Deceased</button>
+                <button class="category-button" onclick="showTable('burial')" title="View burial spots">Burial Spots</button>
+                <button class="category-button" onclick="showTable('messages')" title="View user messages">Messages</button>
             </div>
 
-            <!-- Deceased Table -->
-            <table id="deceased-table" class="data-table">
-                <thead>
-                    <tr>
-                        <th>Deceased ID</th>
-                        <th>Full Name</th>
-                        <th>Birth Date</th>
-                        <th>Death Date</th>
-                        <th>Block ID</th>
-                        <th>Spot ID</th>
-                        <th>Created At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>John Doe</td>
-                        <td>1950-01-01</td>
-                        <td>2020-05-15</td>
-                        <td>A1</td>
-                        <td>101</td>
-                        <td>2020-05-15 10:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Jane Smith</td>
-                        <td>1960-02-02</td>
-                        <td>2021-06-20</td>
-                        <td>A1</td>
-                        <td>102</td>
-                        <td>2021-06-20 11:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Robert Brown</td>
-                        <td>1945-03-03</td>
-                        <td>2019-07-10</td>
-                        <td>A2</td>
-                        <td>201</td>
-                        <td>2019-07-10 09:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Emily White</td>
-                        <td>1975-04-04</td>
-                        <td>2022-08-25</td>
-                        <td>A2</td>
-                        <td>202</td>
-                        <td>2022-08-25 14:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Michael Green</td>
-                        <td>1980-05-05</td>
-                        <td>2023-09-30</td>
-                        <td>A3</td>
-                        <td>301</td>
-                        <td>2023-09-30 16:00:00</td>
-                    </tr>
-                </tbody>
-            </table>
+            <!-- Table Section -->
+            <div class="table-section">
+                <!-- Deceased Table -->
+                <table id="deceased-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortColumn('deceased-table', 0)">Deceased ID <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('deceased-table', 1)">Full Name <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('deceased-table', 2)">Birth Date <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('deceased-table', 3)">Death Date <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('deceased-table', 4)">Block ID <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('deceased-table', 5)">Spot ID <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('deceased-table', 6)">Created At <span class="sort-arrow">⮟</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>John Doe</td><td>1950-01-01</td><td>2020-05-15</td><td>1</td><td>101</td><td>2020-05-15 10:00:00</td></tr>
+                        <tr><td>2</td><td>Jane Smith</td><td>1960-02-02</td><td>2021-06-20</td><td>1</td><td>102</td><td>2021-06-20 11:00:00</td></tr>
+                        <tr><td>3</td><td>Robert Brown</td><td>1945-03-03</td><td>2019-07-10</td><td>2</td><td>201</td><td>2019-07-10 09:00:00</td></tr>
+                        <tr><td>4</td><td>Emily Davis</td><td>1975-04-04</td><td>2022-08-25</td><td>3</td><td>301</td><td>2022-08-25 14:00:00</td></tr>
+                        <tr><td>5</td><td>Michael Johnson</td><td>1935-05-05</td><td>2018-12-30</td><td>4</td><td>401</td><td>2018-12-30 16:00:00</td></tr>
+                        <tr><td>6</td><td>Sarah Wilson</td><td>1980-06-06</td><td>2023-01-15</td><td>5</td><td>501</td><td>2023-01-15 12:00:00</td></tr>
+                    </tbody>
+                </table>
 
-            <!-- Burial Spots Table -->
-            <table id="burial-table" class="data-table" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Spot ID</th>
-                        <th>Block ID</th>
-                        <th>Availability</th>
-                        <th>Deceased ID</th>
-                        <th>Coordinates</th>
-                        <th>Created At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>101</td>
-                        <td>A1</td>
-                        <td>Occupied</td>
-                        <td>1</td>
-                        <td>10.123, 20.456</td>
-                        <td>2020-05-15 10:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>102</td>
-                        <td>A1</td>
-                        <td>Occupied</td>
-                        <td>2</td>
-                        <td>10.124, 20.457</td>
-                        <td>2021-06-20 11:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>201</td>
-                        <td>A2</td>
-                        <td>Occupied</td>
-                        <td>3</td>
-                        <td>10.125, 20.458</td>
-                        <td>2019-07-10 09:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>202</td>
-                        <td>A2</td>
-                        <td>Occupied</td>
-                        <td>4</td>
-                        <td>10.126, 20.459</td>
-                        <td>2022-08-25 14:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>301</td>
-                        <td>A3</td>
-                        <td>Occupied</td>
-                        <td>5</td>
-                        <td>10.127, 20.460</td>
-                        <td>2023-09-30 16:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>302</td>
-                        <td>A3</td>
-                        <td>Available</td>
-                        <td></td>
-                        <td>10.128, 20.461</td>
-                        <td>2023-10-01 12:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>303</td>
-                        <td>A3</td>
-                        <td>Available</td>
-                        <td></td>
-                        <td>10.129, 20.462</td>
-                        <td>2023-10-02 13:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>304</td>
-                        <td>A3</td>
-                        <td>Available</td>
-                        <td></td>
-                        <td>10.130, 20.463</td>
-                        <td>2023-10-03 14:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>305</td>
-                        <td>A3</td>
-                        <td>Available</td>
-                        <td></td>
-                        <td>10.131, 20.464</td>
-                        <td>2023-10-04 15:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>306</td>
-                        <td>A3</td>
-                        <td>Available</td>
-                        <td></td>
-                        <td>10.132, 20.465</td>
-                        <td>2023-10-05 16:00:00</td>
-                    </tr>
-                </tbody>
-            </table>
+                <!-- Burial Spots Table -->
+                <table id="burial-table" class="data-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th onclick="sortColumn('burial-table', 0)">Spot ID <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('burial-table', 1)">Block ID <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('burial-table', 2)">Availability <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('burial-table', 3)">Deceased ID <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('burial-table', 4)">Coordinates <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('burial-table', 5)">Created At <span class="sort-arrow">⮟</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>101</td><td>1</td><td>Occupied</td><td>1</td><td>10.123, 20.456</td><td>2020-05-15 10:00:00</td></tr>
+                        <tr><td>102</td><td>1</td><td>Occupied</td><td>2</td><td>10.124, 20.457</td><td>2021-06-20 11:00:00</td></tr>
+                        <tr><td>103</td><td>2</td><td>Available</td><td></td><td>10.125, 20.458</td><td>2022-01-10 09:00:00</td></tr>
+                        <tr><td>104</td><td>2</td><td>Occupied</td><td>3</td><td>10.126, 20.459</td><td>2019-07-10 09:00:00</td></tr>
+                        <tr><td>105</td><td>3</td><td>Available</td><td></td><td>10.127, 20.460</td><td>2023-03-15 14:00:00</td></tr>
+                        <tr><td>106</td><td>3</td><td>Occupied</td><td>4</td><td>10.128, 20.461</td><td>2022-08-25 14:00:00</td></tr>
+                        <tr><td>107</td><td>4</td><td>Available</td><td></td><td>10.129, 20.462</td><td>2021-12-30 16:00:00</td></tr>
+                        <tr><td>108</td><td>4</td><td>Occupied</td><td>5</td><td>10.130, 20.463</td><td>2018-12-30 16:00:00</td></tr>
+                        <tr><td>109</td><td>5</td><td>Available</td><td></td><td>10.131, 20.464</td><td>2023-05-10 12:00:00</td></tr>
+                        <tr><td>110</td><td>5</td><td>Occupied</td><td>6</td><td>10.132, 20.465</td><td>2023-01-15 12:00:00</td></tr>
+                    </tbody>
+                </table>
 
-            <!-- Messages Table -->
-            <table id="messages-table" class="data-table" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email Address</th>
-                        <th>Subject</th>
-                        <th>Message</th>
-                        <th>Submitted At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Michael Doe</td>
-                        <td>johndoe@example.com</td>
-                        <td>Inquiry</td>
-                        <td>Can you provide more details about burial spots?</td>
-                        <td>2023-10-05 10:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>Mariel Smith</td>
-                        <td>janesmith@example.com</td>
-                        <td>Feedback</td>
-                        <td>The website is very helpful. Thank you!</td>
-                        <td>2023-10-06 12:30:00</td>
-                    </tr>
-                </tbody>
-            </table>
+                <!-- Messages Table -->
+                <table id="messages-table" class="data-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th onclick="sortColumn('messages-table', 0)">Name <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('messages-table', 1)">Email Address <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('messages-table', 2)">Subject <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('messages-table', 3)">Message <span class="sort-arrow">⮟</span></th>
+                            <th onclick="sortColumn('messages-table', 4)">Submitted At <span class="sort-arrow">⮟</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Michael Doe</td><td>johndoe@example.com</td><td>Inquiry</td><td>Can you provide more details about burial spots?</td><td>2023-10-05 10:00:00</td></tr>
+                        <tr><td>Jane Roe</td><td>janeroe@example.com</td><td>Complaint</td><td>The website is not loading properly.</td><td>2023-10-06 14:30:00</td></tr>
+                        <tr><td>John Smith</td><td>johnsmith@example.com</td><td>Feedback</td><td>Great website! Very helpful.</td><td>2023-10-07 09:15:00</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -313,75 +182,38 @@
             document.getElementById('messages-table').style.display = tableId === 'messages' ? 'table' : 'none';
         }
 
-        function sortTable() {
-            // Sorting logic placeholder
-            alert('Sorting functionality not implemented yet.');
+        function sortColumn(tableId, columnIndex) {
+            const table = document.getElementById(tableId);
+            const rows = Array.from(table.tBodies[0].rows);
+            const arrow = table.tHead.rows[0].cells[columnIndex].querySelector('.sort-arrow');
+            const isAscending = arrow.textContent === '⮟';
+
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].textContent.trim();
+                const bText = b.cells[columnIndex].textContent.trim();
+                return isAscending
+                    ? aText.localeCompare(bText, undefined, { numeric: true })
+                    : bText.localeCompare(aText, undefined, { numeric: true });
+            });
+
+            rows.forEach(row => table.tBodies[0].appendChild(row));
+            arrow.textContent = isAscending ? '⮝' : '⮟';
         }
     </script>
 
     <style>
-        .database-container {
-            display: flex;
-            height: calc(100vh - 70px);
-            width: 100%;
-        }
-
-        .categories {
-            width: 20%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-        }
-
-        .category-button {
-            width: 90%;
-            margin: 10px 0;
-            padding: 10px;
-            font-size: 16px;
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .category-button:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-
-        .table-section {
-            width: 80%;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .sorting {
-            margin-bottom: 10px;
-            text-align: left;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        .data-table th, .data-table td {
-            border: 1px solid #fff;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .data-table th {
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-
-        .data-table tbody tr:nth-child(even) {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+        .database-container { display: flex; height: calc(100vh - 70px); width: 100%; }
+        .categories { width: 20%; background: rgba(0, 0, 0, 0.7); padding: 10px; }
+        .category-button { width: 90%; margin: 10px 0; padding: 10px; font-size: 16px; color: #fff; background: rgba(255, 255, 255, 0.2); border: none; cursor: pointer; }
+        .category-button:hover { background: rgba(255, 255, 255, 0.4); }
+        .table-section { width: 80%; padding: 20px; overflow-y: auto; }
+        .sorting { margin-bottom: 10px; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .data-table th, .data-table td { border: 1px solid #fff; padding: 8px; }
+        .data-table th { background: rgba(0, 0, 0, 0.7); }
+        .data-table tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.1); }
+        .sort-arrow { display: inline-block; margin-left: 5px; font-size: 12px; color: white;  font-weight: bold;
+}
     </style>
 </body>
 </html>
