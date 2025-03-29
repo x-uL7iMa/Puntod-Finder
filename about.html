@@ -1,115 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta Information -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About us</title>
-    
-    <!-- Styles -->
-    <style>
-        /* General styles */
-        html, body {
-            height: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: url('images/Inside Path View.png') no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
-            text-align: center;
-        }
+    <title>About Us</title>
 
-        /* Header styles */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: #fff;
-        }
-        .logo img {
-            height: 50px;
-            margin-right: 10px;
-        }
-        nav {
-            display: flex;
-            gap: 15px;
-        }
-        nav a {
-            text-decoration: none;
-            color: #fff;
-            padding: 10px 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        nav a:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-
-        /* Main content styles */
-        .main-content {
-            padding: 20px;
-            max-height: calc(100vh - 70px);
-            overflow-y: auto;
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            margin: 20px;
-        }
-
-        /* FAQ styles */
-        .faq {
-            text-align: left;
-            margin: 20px auto;
-            max-width: 800px;
-        }
-        .faq-item {
-            margin-bottom: 15px;
-        }
-        .faq-question {
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .faq-question:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-        .faq-answer {
-            display: none;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            margin-top: 5px;
-        }
-    </style>
-
-    <!-- Scripts -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const questions = document.querySelectorAll('.faq-question');
-            questions.forEach(question => {
-                question.addEventListener('click', () => {
-                    const answer = question.nextElementSibling;
-                    answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
-                });
-            });
-        });
-    </script>
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="styles/about.css">
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header Section -->
     <header>
+        <!-- Logo -->
         <a href="index.html" class="logo">
             <img src="images/handsomeShrek.jpg" alt="Puntod Finder Logo">
             <span>Puntod Finder</span>
         </a>
+
+        <!-- Navigation Links -->
         <nav>
             <a href="about.html">About Us</a>
             <a href="contact.html">Contact</a>
@@ -117,7 +26,7 @@
         </nav>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Content Section -->
     <div class="main-content">
         <div class="faq">
             <!-- FAQ Item 1 -->
@@ -137,5 +46,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Link to External JavaScript -->
+    <script src="scripts/about.js"></script>
 </body>
 </html>

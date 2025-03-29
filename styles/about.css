@@ -1,0 +1,90 @@
+/* General Body Styling */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('../images/Inside Path View.png') no-repeat center center fixed; /* Background image */
+    background-size: cover; /* Cover the entire viewport */
+    color: #fff; /* White text color */
+    text-align: center; /* Center-align text */
+}
+
+/* Header Section Styling */
+header {
+    display: flex; /* Flexbox for layout */
+    justify-content: space-between; /* Space between logo and navigation */
+    align-items: center; /* Vertically center items */
+    padding: 10px 20px; /* Padding around the header */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+}
+
+.logo {
+    display: flex; /* Flexbox for logo layout */
+    align-items: center; /* Vertically center logo items */
+    text-decoration: none; /* Remove underline */
+    color: #fff; /* White text color */
+}
+
+.logo img {
+    height: 50px; /* Logo image height */
+    margin-right: 10px; /* Space between image and text */
+}
+
+nav {
+    display: flex; /* Flexbox for navigation layout */
+    gap: 15px; /* Space between navigation links */
+}
+
+nav a {
+    text-decoration: none; /* Remove underline */
+    color: #fff; /* White text color */
+    padding: 10px 20px; /* Padding around links */
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s; /* Smooth hover effect */
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.4); /* Lighter background on hover */
+}
+
+/* Main Content Section Styling */
+.main-content {
+    padding: 20px; /* Padding around the content */
+    max-height: calc(100vh - 70px); /* Full height minus header */
+    overflow-y: auto; /* Enable vertical scrolling */
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    border-radius: 10px; /* Rounded corners */
+    margin: 20px; /* Space around the content */
+}
+
+/* FAQ Section Styling */
+.faq {
+    text-align: left; /* Align text to the left */
+    margin: 20px auto; /* Center the FAQ section */
+    max-width: 800px; /* Limit the width of the FAQ section */
+}
+
+.faq-item {
+    margin-bottom: 15px; /* Space between FAQ items */
+}
+
+.faq-question {
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+    padding: 15px; /* Padding inside the question */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth hover effect */
+}
+
+.faq-question:hover {
+    background-color: rgba(255, 255, 255, 0.4); /* Lighter background on hover */
+}
+
+.faq-answer {
+    display: none; /* Hidden by default */
+    padding: 15px; /* Padding inside the answer */
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+    border-radius: 5px; /* Rounded corners */
+    margin-top: 5px; /* Space above the answer */
+}

@@ -1,138 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta Information -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puntod Finder</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: url('images/Front Gate View.png') no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
-            text-align: center;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: #fff;
-        }
-        .logo img {
-            height: 50px;
-            margin-right: 10px;
-        }
-        nav {
-            display: flex;
-            gap: 15px;
-        }
-        nav a {
-            text-decoration: none;
-            color: #fff;
-            padding: 10px 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        nav a:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-        .main-content {
-            height: calc(100vh - 70px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .search-bar {
-            margin-bottom: 10px;
-        }
-        .search-bar input {
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            width: 300px;
-        }
-        .search-bar button {
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #fff;
-            background-color: rgba(0, 0, 0, 0.7);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .search-bar button:hover {
-            background-color: rgba(0, 0, 0, 0.9);
-        }
-        .map-container {
-            margin-top: 20px;
-            width: 80%;
-            height: 400px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            font-size: 18px;
-        }
 
-        /* Updated Forgot Link Styling */
-        .forgot-link {
-            margin-top: 10px;
-            font-size: 16px;
-            color: white;
-        }
-        .forgot-link a {
-            color: yellow;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .forgot-link a:hover {
-            text-decoration: underline;
-        }
-
-        .forgot-form {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-        .forgot-form input {
-            margin: 5px;
-            padding: 10px;
-            width: 250px;
-            border-radius: 5px;
-            border: none;
-        }
-        .forgot-form button {
-            margin-top: 10px;
-            padding: 10px;
-            border: none;
-            background: green;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
+    <!-- Header Section -->
     <header>
+        <!-- Logo -->
         <a href="index.html" class="logo">
             <img src="images/handsomeShrek.jpg" alt="Puntod Finder Logo">
             <span>Puntod Finder</span>
         </a>
+
+        <!-- Navigation Links -->
         <nav>
             <a href="about.html">About Us</a>
             <a href="contact.html">Contact</a>
@@ -140,64 +26,36 @@
         </nav>
     </header>
 
+    <!-- Main Content Section -->
     <div class="main-content">
+        <!-- Search Bar -->
         <div class="search-bar" id="searchBar">
             <input type="text" id="searchInput" placeholder="Enter Section (e.g., Section 1)" />
             <button onclick="searchSection()">Search</button>
         </div>
 
-        <!-- Updated Forgot Link -->
+        <!-- Forgot Form Link -->
         <p class="forgot-link">Can't remember? <a href="#" onclick="toggleForgotForm()">Click here</a></p>
 
+        <!-- Forgot Form -->
         <div class="forgot-form" id="forgotForm">
+            <!-- Email Input -->
             <input type="email" id="email" placeholder="Enter your Gmail" />
+            <!-- Deceased Name Input -->
             <input type="text" id="deceasedName" placeholder="Enter Name of the Deceased" />
+            <!-- Death Date Input -->
             <input type="date" id="deathDate" />
+            <!-- Submit Button -->
             <button onclick="submitForgotForm()">Submit</button>
         </div>
         
+        <!-- Map Container -->
         <div id="mapContainer" class="map-container">
             <p id="mapMessage">Map for the selected section will appear here.</p>
         </div>
     </div>
 
-    <script>
-        function searchSection() {
-            const input = document.getElementById('searchInput').value.trim().toLowerCase();
-            const mapContainer = document.getElementById('mapContainer');
-            const mapMessage = document.getElementById('mapMessage');
-            const sections = {
-                "section 1": "Map for Section 1: [Location details here]",
-                "section 2": "Map for Section 2: [Location details here]"
-            };
-            if (sections[input]) {
-                mapMessage.textContent = sections[input];
-                mapContainer.style.display = 'flex';
-            } else {
-                mapMessage.textContent = "Section not found. Please enter a valid section.";
-                mapContainer.style.display = 'flex';
-            }
-        }
-
-        function toggleForgotForm() {
-            const form = document.getElementById('forgotForm');
-            const searchBar = document.getElementById('searchBar');
-            if (form.style.display === 'none' || form.style.display === '') {
-                form.style.display = 'flex';
-                searchBar.style.display = 'none';
-            } else {
-                form.style.display = 'none';
-                searchBar.style.display = 'block';
-            }
-        }
-
-        function submitForgotForm() {
-            alert("Your request has been submitted.");
-            document.getElementById('forgotForm').style.display = 'none';
-            document.getElementById('searchBar').style.display = 'block';
-        }
-        /* test */
-    </script>
+    <!-- Link to External JavaScript -->
+    <script src="scripts/scripts.js"></script>
 </body>
 </html>
-]
