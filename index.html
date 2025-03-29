@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puntod Finder</title>
     <style>
-        /* General Styles */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -14,8 +13,6 @@
             color: #fff;
             text-align: center;
         }
-
-        /* Header Styles */
         header {
             display: flex;
             justify-content: space-between;
@@ -23,8 +20,6 @@
             padding: 10px 20px;
             background-color: rgba(0, 0, 0, 0.5);
         }
-
-        /* Logo Styles */
         .logo {
             display: flex;
             align-items: center;
@@ -35,8 +30,6 @@
             height: 50px;
             margin-right: 10px;
         }
-
-        /* Navigation Styles */
         nav {
             display: flex;
             gap: 15px;
@@ -52,41 +45,94 @@
         nav a:hover {
             background-color: rgba(255, 255, 255, 0.4);
         }
-
-        /* Main Content Styles */
         .main-content {
-            height: calc(100vh - 70px); /* Full height minus header height */
+            height: calc(100vh - 70px);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
         }
-
-        /* Button Styles */
-        .find-button {
-            padding: 15px 30px;
-            font-size: 20px;
+        .search-bar {
+            margin-bottom: 10px;
+        }
+        .search-bar input {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            width: 300px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            font-size: 16px;
             color: #fff;
             background-color: rgba(0, 0, 0, 0.7);
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            text-decoration: none;
             transition: background-color 0.3s;
         }
-        .find-button:hover {
+        .search-bar button:hover {
             background-color: rgba(0, 0, 0, 0.9);
+        }
+        .map-container {
+            margin-top: 20px;
+            width: 80%;
+            height: 400px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        /* Updated Forgot Link Styling */
+        .forgot-link {
+            margin-top: 10px;
+            font-size: 16px;
+            color: white;
+        }
+        .forgot-link a {
+            color: yellow;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-form {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .forgot-form input {
+            margin: 5px;
+            padding: 10px;
+            width: 250px;
+            border-radius: 5px;
+            border: none;
+        }
+        .forgot-form button {
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            background: green;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <!-- Header Section -->
     <header>
-        <!-- Logo -->
         <a href="index.html" class="logo">
             <img src="images/handsomeShrek.jpg" alt="Puntod Finder Logo">
             <span>Puntod Finder</span>
         </a>
-        <!-- Navigation -->
         <nav>
             <a href="about.html">About Us</a>
             <a href="contact.html">Contact</a>
@@ -94,10 +140,63 @@
         </nav>
     </header>
 
-    <!-- Main Content Section -->
     <div class="main-content">
-        <!-- Find Button -->
-        <a href="map.html" class="find-button">Find Puntod</a>
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Enter Section (e.g., Section 1)" />
+            <button onclick="searchSection()">Search</button>
+        </div>
+
+        <!-- Updated Forgot Link -->
+        <p class="forgot-link">Can't remember? <a href="#" onclick="toggleForgotForm()">Click here</a></p>
+
+        <div class="forgot-form" id="forgotForm">
+            <input type="email" id="email" placeholder="Enter your Gmail" />
+            <input type="text" id="deceasedName" placeholder="Enter Name of the Deceased" />
+            <input type="date" id="deathDate" />
+            <button onclick="submitForgotForm()">Submit</button>
+        </div>
+        
+        <div id="mapContainer" class="map-container">
+            <p id="mapMessage">Map for the selected section will appear here.</p>
+        </div>
     </div>
+
+    <script>
+        function searchSection() {
+            const input = document.getElementById('searchInput').value.trim().toLowerCase();
+            const mapContainer = document.getElementById('mapContainer');
+            const mapMessage = document.getElementById('mapMessage');
+            const sections = {
+                "section 1": "Map for Section 1: [Location details here]",
+                "section 2": "Map for Section 2: [Location details here]"
+            };
+            if (sections[input]) {
+                mapMessage.textContent = sections[input];
+                mapContainer.style.display = 'flex';
+            } else {
+                mapMessage.textContent = "Section not found. Please enter a valid section.";
+                mapContainer.style.display = 'flex';
+            }
+        }
+
+        function toggleForgotForm() {
+            const form = document.getElementById('forgotForm');
+            const searchBar = document.getElementById('searchBar');
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'flex';
+                searchBar.style.display = 'none';
+            } else {
+                form.style.display = 'none';
+                searchBar.style.display = 'block';
+            }
+        }
+
+        function submitForgotForm() {
+            alert("Your request has been submitted.");
+            document.getElementById('forgotForm').style.display = 'none';
+            document.getElementById('searchBar').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
+]
