@@ -1,86 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta Information -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puntod Finder</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Puntod Finder - San Pedro Bautista Memorial Park II</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("images/Front%20Gate%20View.png") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    body.fade-out {
+      opacity: 0;
+    }
+    body.fade-in {
+      opacity: 1;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 30px;
+      background-color: #3f6a54;
+      color: white;
+      height: 50px;
+      flex-shrink: 0;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+    }
+    .header-logo img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 50px;
+    }
+    .nav-link {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .nav-link img {
+      height: 24px;
+      width: 24px;
+    }
+    .nav-tooltip {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: -20px;
+      background-color: #34495e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      font-size: 12px;
+      transform: translateY(5px);
+    }
+    .nav-link:hover .nav-tooltip {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0px);
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start; /* move content to start */
+      align-items: center;
+      padding: 80px 20px 40px; /* top padding to push it up */
+      text-align: center;
+    }
+    .logo {
+      width: 100px;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .view-map-link {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background-color: #2c3e50cc;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+    .view-map-link:hover {
+      background-color: #1a252f;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 0.9rem;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
 
-    <!-- Link to External CSS -->
-    <link rel="stylesheet" href="styles/styles.css">
+    @media (max-width: 600px) {
+      header {
+        padding: 8px 15px;
+      }
+      .header-nav {
+        gap: 20px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      p {
+        font-size: 1rem;
+      }
+      .view-map-link {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
 </head>
-<body>
-    <!-- Header Section -->
-    <header>
-        <!-- Logo -->
-        <a href="index.html" class="logo">
-            <img src="images/Puntod Locator Logo 2.png" alt="Puntod Finder Logo">
-            <span>Puntod Finder</span>
-        </a>
+<body class="fade-out">
+<header>
+  <a href="index.html" class="header-logo" style="text-decoration: none; color: white;">
+    <img src="images/Puntod%20Finder%20Logo.png" alt="Puntod Finder Logo">
+    <h2 style="font-size: 18px; margin: 0;">Puntod Finder</h2>
+  </a>
+  <nav class="header-nav">
+    <a class="nav-link" href="about.html">
+      <img src="images/about-us.png" alt="About Us Icon">
+      <span class="nav-tooltip">About Us</span>
+    </a>
+    <a class="nav-link" href="contact.html">
+      <img src="images/contact-us.png" alt="Contact Us Icon">
+      <span class="nav-tooltip">Contact Us</span>
+    </a>
+    <a class="nav-link" href="admin.html">
+      <img src="images/administrator.png" alt="Admin Icon">
+      <span class="nav-tooltip">Admin</span>
+    </a>
+  </nav>
+</header>
 
-        <!-- Navigation Links -->
-        <nav>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact</a>
-            <a href="adminlogin.html">Admin</a>
-        </nav>
-    </header>
+<main>
+  <img src="images/Puntod%20Finder%20Logo%203.png" alt="Puntod Finder Logo" class="logo">
+  <h1>Puntod Finder</h1>
+  <p>Find your loved ones at San Pedro Bautista Memorial Park II</p>
+  <a href="map.html" class="view-map-link">View Map</a>
+</main>
 
-    <!-- Main Content Section -->
-    <div class="main-content">
-        <!-- Search Bar -->
-        <div class="search-bar" id="searchBar">
-            <input type="text" id="searchInput" placeholder="Enter Section (e.g., Section 1)" />
-            <button onclick="searchSection()">Search</button>
-        </div>
+<footer>© 2025 Puntod Finder</footer>
 
-        <!-- Forgot Form Link -->
-        <p class="forgot-link">Can't remember? <a href="#" onclick="toggleForgotForm()">Click here</a></p>
+<script>
+  // Fade in on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.add('fade-in');
+    document.body.classList.remove('fade-out');
+  });
 
-        <!-- Forgot Form -->
-        <div class="forgot-form" id="forgotForm" style="display: none;">
-            <!-- Email Input -->
-            <input type="email" id="email" placeholder="Enter your Gmail" />
-            <!-- Deceased Name Input -->
-            <input type="text" id="deceasedName" placeholder="Enter Name of the Deceased" />
-            <!-- Death Date Input -->
-            <input type="date" id="deathDate" />
-            <!-- Submit Button -->
-            <button onclick="submitForgotForm()">Submit</button>
-        </div>
-        
-        <!-- Map Container -->
-        <div id="mapContainer" class="map-container">
-            <iframe src="search.html" id="mapFrame" style="width: 100%; height: 400px; border: none;"></iframe>
-        </div>
-    </div>
+  // Fade out on link click
+  document.querySelectorAll('a.nav-link, .view-map-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const destination = this.href;
+      document.body.classList.remove('fade-in');
+      document.body.classList.add('fade-out');
+      setTimeout(() => {
+        window.location.href = destination;
+      }, 500); // matches CSS transition
+    });
+  });
+</script>
 
-    <!-- Link to External JavaScript -->
-    <script>
-        // Toggle Forgot Form Visibility
-        function toggleForgotForm() {
-            const forgotForm = document.getElementById('forgotForm');
-            forgotForm.style.display = forgotForm.style.display === 'none' ? 'block' : 'none';
-        }
-
-        // Placeholder for Search Section Functionality
-        function searchSection() {
-            const searchInput = document.getElementById('searchInput').value;
-            alert(`Searching for: ${searchInput}`);
-        }
-
-        // Placeholder for Forgot Form Submission
-        function submitForgotForm() {
-            const email = document.getElementById('email').value;
-            const deceasedName = document.getElementById('deceasedName').value;
-            const deathDate = document.getElementById('deathDate').value;
-
-            if (email && deceasedName && deathDate) {
-                alert('Form submitted successfully!');
-            } else {
-                alert('Please fill out all fields.');
-            }
-        }
-    </script>
 </body>
 </html>

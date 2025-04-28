@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leaflet Map with Resizable Image</title>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <!-- Leaflet Draw CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      #map {
+        height: 100vh;
+        width: 100%;
+      }
+
+      .custom-button {
+        position: absolute;
+        right: 10px;
+        z-index: 1000;
+        padding: 8px 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 5px;
+      }
+
+      .custom-button:hover {
+        background-color: #0056b3;
+      }
+
+      #exportBtn {
+        top: 10px;
+      }
+
+      #importBtn {
+        top: 50px;
+      }
+
+      #addImageBtn {
+        top: 90px;
+      }
+
+      #toggleViewBtn {
+        top: 130px;
+      }
+
+      #imageControls {
+        position: absolute;
+        top: 180px;
+        right: 10px;
+        z-index: 1000;
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        display: none;
+      }
+
+      .image-control-group {
+        margin-bottom: 10px;
+      }
+
+      .image-control-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      #importInput, #imageInput {
+        display: none;
+      }
+      
+      .resize-handle {
+        width: 12px;
+        height: 12px;
+        background-color: white;
+        border: 2px solid #0078A8;
+        border-radius: 50%;
+        cursor: move;
+        position: absolute;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+
+  <body>
+    <button id="exportBtn" class="custom-button" onclick="exportGeoJSON()">Export GeoJSON</button>
+    <button id="importBtn" class="custom-button" onclick="document.getElementById('importInput').click()">Import GeoJSON</button>
+    <button id="addImageBtn" class="custom-button" onclick="document.getElementById('imageInput').click()">Add Image</button>
+    <button id="toggleViewBtn" class="custom-button" onclick="toggleBasemap()">Toggle Satellite</button>
+
+    <div id="imageControls">
+      <div class="image-control-group">
+        <label for="opacitySlider">Opacity:</label>
+        <input type="range" id="opacitySlider" min="0" max="1" step="0.1" value="0.7">
+      </div>
+      <div class="image-control-group">
+        <button id="removeImageBtn" onclick="removeCurrentImage()">Remove Image</button>
+      </div>
+    </div>
+
+    <input type="file" id="importInput" accept=".geojson,application/json" />
+    <input type="file" id="imageInput" accept="image/*" />
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+
+    <!-- Leaflet Draw JS -->
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+    <script>
+      const map = L.map("map").setView([13.9327312, 121.4061204], 18);
+
+      // Base layers
+      const openStreetMap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+        minZoom: 0,
+        maxZoom: 25,
+      });
+
+      const esriSat = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+        }
+      );
+
+      openStreetMap.addTo(map);
+      let currentBaseLayer = "osm";
+
+      function toggleBasemap() {
+        if (currentBaseLayer === "osm") {
+          map.removeLayer(openStreetMap);
+          esriSat.addTo(map);
+          currentBaseLayer = "satellite";
+        } else {
+          map.removeLayer(esriSat);
+          openStreetMap.addTo(map);
+          currentBaseLayer = "osm";
+        }
+      }
+
+      // Feature group to store drawn layers
+      const drawnItems = new L.FeatureGroup();
+      map.addLayer(drawnItems);
+
+      // Set up draw control with custom styles
+      const drawControl = new L.Control.Draw({
+        edit: {
+          featureGroup: drawnItems,
+          remove: true,
+        },
+        draw: {
+          polygon: {
+            shapeOptions: {
+              color: "blue",
+              weight: 3,
+              fillOpacity: 0.6,
+            },
+          },
+          rectangle: {
+            shapeOptions: {
+              color: "green",
+              weight: 2,
+            },
+          },
+          circlemarker: false,
+          polyline: false,
+        },
+      });
+      map.addControl(drawControl);
+
+      let currentImageOverlay = null;
+      let cornerHandles = [];
+      let imageAspectRatio = 1;
+
+      map.on('draw:created', function(e) {
+        drawnItems.addLayer(e.layer);
+      });
+
+      function exportGeoJSON() {
+        const data = drawnItems.toGeoJSON();
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "drawn-features.geojson";
+        link.click();
+      }
+
+      document.getElementById("importInput").addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          try {
+            const geojson = JSON.parse(event.target.result);
+            L.geoJSON(geojson, {
+              style: function (feature) {
+                return { color: "orange", weight: 2, fillOpacity: 0.4 };
+              },
+            }).eachLayer((layer) => drawnItems.addLayer(layer));
+          } catch (err) {
+            alert("Invalid GeoJSON file.");
+            console.error(err);
+          }
+        };
+        reader.readAsText(file);
+        this.value = null;
+      });
+
+      function addResizableImage(imgUrl) {
+        removeCurrentImage();
+        const img = new Image();
+        img.onload = function() {
+          imageAspectRatio = img.width / img.height;
+          const center = map.getCenter();
+          const offsetLat = 0.0005;
+          const offsetLng = offsetLat * imageAspectRatio;
+          const bounds = [
+            [center.lat - offsetLat, center.lng - offsetLng],
+            [center.lat + offsetLat, center.lng + offsetLng]
+          ];
+          currentImageOverlay = L.imageOverlay(imgUrl, bounds, {
+            opacity: 0.7,
+            interactive: true
+          }).addTo(map);
+          currentImageOverlay.customBounds = {
+            center: center,
+            width: offsetLng * 2,
+            height: offsetLat * 2
+          };
+          addResizeHandles();
+          makeImageDraggable();
+          document.getElementById('imageControls').style.display = 'block';
+          document.getElementById('opacitySlider').value = 0.7;
+          document.getElementById('opacitySlider').addEventListener('input', function() {
+            if (currentImageOverlay) {
+              currentImageOverlay.setOpacity(this.value);
+            }
+          });
+        };
+        img.src = imgUrl;
+      }
+
+      function addResizeHandles() {
+        if (!currentImageOverlay) return;
+        const bounds = currentImageOverlay.getBounds();
+        const seCorner = bounds.getSouthEast();
+        const handlePoint = map.latLngToContainerPoint(seCorner);
+        const handle = document.createElement('div');
+        handle.className = 'resize-handle';
+        handle.id = 'handle-se';
+        handle.style.left = (handlePoint.x - 6) + 'px';
+        handle.style.top = (handlePoint.y - 6) + 'px';
+        document.body.appendChild(handle);
+        cornerHandles = [handle];
+        makeDraggable(handle, 'se');
+        map.on('move', updateHandlePositions);
+      }
+
+      function updateHandlePositions() {
+        if (!currentImageOverlay || cornerHandles.length === 0) return;
+        const bounds = currentImageOverlay.getBounds();
+        const seCorner = bounds.getSouthEast();
+        const handlePoint = map.latLngToContainerPoint(seCorner);
+        cornerHandles[0].style.left = (handlePoint.x - 6) + 'px';
+        cornerHandles[0].style.top = (handlePoint.y - 6) + 'px';
+      }
+
+      function makeDraggable(element, cornerName) {
+        let isDragging = false;
+        let startX, startY;
+        let startBounds;
+        element.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          isDragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startBounds = currentImageOverlay.getBounds();
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+        function onMouseMove(e) {
+          if (!isDragging) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          const left = parseInt(element.style.left) + dx;
+          const top = parseInt(element.style.top) + dy;
+          element.style.left = left + 'px';
+          element.style.top = top + 'px';
+          const newLatLng = map.containerPointToLatLng(L.point(left + 6, top + 6));
+          const center = startBounds.getCenter();
+          const newWidth = Math.abs(newLatLng.lng - center.lng) * 2;
+          const newHeight = newWidth / imageAspectRatio;
+          const newBounds = [
+            [center.lat - newHeight/2, center.lng - newWidth/2],
+            [center.lat + newHeight/2, center.lng + newWidth/2]
+          ];
+          currentImageOverlay.setBounds(newBounds);
+          startX = e.clientX;
+          startY = e.clientY;
+        }
+        function onMouseUp() {
+          isDragging = false;
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        }
+      }
+
+      function makeImageDraggable() {
+        if (!currentImageOverlay) return;
+        let isDragging = false;
+        let lastPoint = null;
+        currentImageOverlay.on('mousedown', function(e) {
+          isDragging = true;
+          lastPoint = e.containerPoint;
+          map.dragging.disable();
+          L.DomEvent.on(document, 'mousemove', onMouseMove);
+          L.DomEvent.on(document, 'mouseup', onMouseUp);
+        });
+        function onMouseMove(e) {
+          if (!isDragging) return;
+          const currentPoint = L.point(e.clientX, e.clientY);
+          const offset = currentPoint.subtract(lastPoint);
+          const center = currentImageOverlay.getBounds().getCenter();
+          const newCenter = map.containerPointToLatLng(
+            map.latLngToContainerPoint(center).add(offset)
+          );
+          const bounds = currentImageOverlay.getBounds();
+          const width = bounds.getEast() - bounds.getWest();
+          const height = bounds.getNorth() - bounds.getSouth();
+          const newBounds = [
+            [newCenter.lat - height/2, newCenter.lng - width/2],
+            [newCenter.lat + height/2, newCenter.lng + width/2]
+          ];
+          currentImageOverlay.setBounds(newBounds);
+          updateHandlePositions();
+          lastPoint = currentPoint;
+        }
+        function onMouseUp() {
+          isDragging = false;
+          map.dragging.enable();
+          L.DomEvent.off(document, 'mousemove', onMouseMove);
+          L.DomEvent.off(document, 'mouseup', onMouseUp);
+        }
+      }
+
+      document.getElementById("imageInput").addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const imgUrl = event.target.result;
+          addResizableImage(imgUrl);
+        };
+        reader.readAsDataURL(file);
+        this.value = null;
+      });
+
+      function removeCurrentImage() {
+        if (currentImageOverlay) {
+          map.removeLayer(currentImageOverlay);
+          currentImageOverlay = null;
+          cornerHandles.forEach(handle => {
+            if (handle && handle.parentNode) {
+              handle.parentNode.removeChild(handle);
+            }
+          });
+          cornerHandles = [];
+          document.getElementById('imageControls').style.display = 'none';
+          map.off('move', updateHandlePositions);
+        }
+      }
+    </script>
+  </body>
+</html>

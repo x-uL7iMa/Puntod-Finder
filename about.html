@@ -1,53 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta Information -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us</title>
-
-    <!-- Link to External CSS -->
-    <link rel="stylesheet" href="styles/about.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About Us - Puntod Finder</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("images/Front%20Gate%20View.png") no-repeat center center fixed;
+      background-size: 101.2%;
+      background-position: 0% 50%;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    body.fade-out {
+      opacity: 0;
+    }
+    body.fade-in {
+      opacity: 1;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 30px;
+      background-color: #3f6a54;
+      color: white;
+      height: 50px;
+      flex-shrink: 0;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+    }
+    .header-logo img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 50px;
+    }
+    .nav-link {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .nav-link img {
+      height: 24px;
+      width: 24px;
+    }
+    .nav-tooltip {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: -20px;
+      background-color: #34495e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      font-size: 12px;
+      transform: translateY(5px);
+    }
+    .nav-link:hover .nav-tooltip {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0px);
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 80px 20px 40px;
+    }
+    .about-container {
+      background: rgba(44, 62, 80, 0.8);
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 800px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    main img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px; /* optional: smooth rounded corners */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4); /* optional: nice soft shadow */
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 0.9rem;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    @media (max-width: 600px) {
+      header {
+        padding: 8px 15px;
+      }
+      .header-nav {
+        gap: 20px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      p {
+        font-size: 1rem;
+      }
+      .about-container {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
-<body>
-    <!-- Header Section -->
-    <header>
-        <!-- Logo -->
-        <a href="index.html" class="logo">
-            <img src="images/Puntod Locator Logo 2.png" alt="Puntod Finder Logo">
-            <span>Puntod Finder</span>
-        </a>
+<body class="fade-out">
+  <header>
+    <a href="index.html" class="header-logo" style="text-decoration: none; color: white;">
+      <img src="images/Puntod%20Finder%20Logo.png" alt="Puntod Finder Logo">
+      <h2 style="font-size: 18px; margin: 0;">Puntod Finder</h2>
+    </a>
+    <nav class="header-nav">
+      <a class="nav-link" href="about.html">
+        <img src="images/about-us.png" alt="About Us Icon">
+        <span class="nav-tooltip">About Us</span>
+      </a>
+      <a class="nav-link" href="contact.html">
+        <img src="images/contact-us.png" alt="Contact Us Icon">
+        <span class="nav-tooltip">Contact Us</span>
+      </a>
+      <a class="nav-link" href="admin.html">
+        <img src="images/administrator.png" alt="Admin Icon">
+        <span class="nav-tooltip">Admin</span>
+      </a>
+    </nav>
+  </header>  
 
-        <!-- Navigation Links -->
-        <nav>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact</a>
-            <a href="admin.html">Admin</a>
-        </nav>
-    </header>
+<main>
+  <div class="about-container">
+    <a href="index.html" style="text-decoration: none; color: white;">← Back to Home</a>
+      <h1>About Puntod Finder</h1>
+      <p>
+        <strong>Puntod Finder</strong> is a digital tool created to help
+        families, friends, and visitors easily locate the final resting place of
+        their loved ones at
+        <strong>San Pedro Bautista Memorial Park II</strong>.
+      </p>
 
-    <!-- Main Content Section -->
-    <div class="main-content">
-        <div class="faq">
-            <!-- FAQ Item 1 -->
-            <div class="faq-item">
-                <div class="faq-question">What is Puntod Finder?</div>
-                <div class="faq-answer">Puntod Finder is a tool designed to help users locate specific locations within a cemetery.</div>
-            </div>
-            <!-- FAQ Item 2 -->
-            <div class="faq-item">
-                <div class="faq-question">How do I use Puntod Finder?</div>
-                <div class="faq-answer">Simply click on the "Find Puntod" button on the homepage and follow the instructions to locate a specific grave.</div>
-            </div>
-            <!-- FAQ Item 3 -->
-            <div class="faq-item">
-                <div class="faq-question">Is Puntod Finder free to use?</div>
-                <div class="faq-answer">Yes, Puntod Finder is completely free to use for all users.</div>
-            </div>
-        </div>
-    </div>
+      <p>
+        This website provides a searchable database tomb locations and an
+        interactive map.
+      </p>
 
-    <!-- Link to External JavaScript -->
-    <script src="scripts/about.js"></script>
+      <h2>About San Pedro Bautista Memorial Park II</h2>
+
+      <img
+        src="images/Inside%20Path%20View.png"
+        alt="San Pedro Bautista Memorial Park II"
+      />
+
+      <p>
+        San Pedro Bautista Memorial Park II is a peaceful and beautifully
+        maintained cemetery located in Candelaria, Quezon. The park serves as
+        the final resting place for many cherished individuals and families.
+      </p>
+
+      <h2>Contact / Developer Info</h2>
+      <p>
+        This project is developed by a group of students, as part of a learning
+        journey to help the local community through digital tools.
+      </p>
+  </div>
+</main>
+
+<footer>© 2025 Puntod Finder</footer>
+
+<script>
+  // Fade in on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.add('fade-in');
+    document.body.classList.remove('fade-out');
+  });
+
+  // Fade out on link click
+  document.querySelectorAll('a.nav-link, a.header-logo, .view-map-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const destination = this.href;
+      document.body.classList.remove('fade-in');
+      document.body.classList.add('fade-out');
+      setTimeout(() => {
+        window.location.href = destination;
+      }, 500);
+    });
+  });
+</script>
+
 </body>
 </html>

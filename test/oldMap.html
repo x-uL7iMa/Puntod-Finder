@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Puntod Finder - San Pedro Bautista Memorial Park II</title>
+    <title>Leaflet Map with Block Search and Directions</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Leaflet CSS -->
@@ -18,75 +18,10 @@
         margin: 0;
         padding: 0;
         height: 100%;
-        font-family: Arial, sans-serif;
-      }
-      /* Header styles - matching index.html */
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 30px;
-        background-color: #3f6a54;
-        color: white;
-        height: 50px;
-        flex-shrink: 0;
-        z-index: 1001; /* Keep header above map */
-      }
-      .header-logo {
-        display: flex;
-        align-items: center;
-      }
-      .header-logo img {
-        height: 40px;
-        margin-right: 10px;
-      }
-      .header-nav {
-        display: flex;
-        align-items: center;
-        gap: 50px;
-      }
-      .nav-link {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        color: white;
-        font-weight: bold;
-        font-size: 12px;
-        cursor: pointer;
-      }
-      .nav-link img {
-        height: 24px;
-        width: 24px;
-      }
-      .nav-tooltip {
-        visibility: hidden;
-        opacity: 0;
-        position: absolute;
-        bottom: -20px;
-        background-color: #34495e;
-        padding: 2px 6px;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-        white-space: nowrap;
-        font-size: 12px;
-        transform: translateY(5px);
-      }
-      .nav-link:hover .nav-tooltip {
-        visibility: visible;
-        opacity: 1;
-        transform: translateY(0px);
-      }
-      /* Map container adjusted to account for header */
-      .map-container {
-        display: flex;
-        flex-direction: column;
-        height: 89vh;
       }
       #map {
-        flex: 1;
         width: 100%;
+        height: 100%;
       }
       .legend {
         padding: 6px 8px;
@@ -116,7 +51,7 @@
       }
       .search-container {
         position: absolute;
-        top: 75px; /* Adjusted to account for header */
+        top: 10px;
         right: 10px;
         z-index: 1000;
         background-color: white;
@@ -135,7 +70,7 @@
       }
       .location-button {
         position: absolute;
-        top: 145px; /* Adjusted to account for header */
+        top: 80px;
         left: 10px;
         z-index: 1000;
         background-color: white;
@@ -189,7 +124,7 @@
       }
       /* Override default Leaflet Routing Machine styles */
       .leaflet-routing-container {
-        top: 60px; /* Adjusted to account for header */
+        top: 65px;
         background-color: white;
         padding: 10px;
         border-radius: 5px;
@@ -204,70 +139,24 @@
       .leaflet-routing-container-hide {
         display: none;
       }
-      
-      /* Fade transition effect */
-      body {
-        opacity: 0;
-        transition: opacity 0.5s ease;
-      }
-      body.fade-out {
-        opacity: 0;
-      }
-      body.fade-in {
-        opacity: 1;
-      }
-      
-      /* Responsive adjustments */
-      @media (max-width: 600px) {
-        header {
-          padding: 8px 15px;
-        }
-        .header-nav {
-          gap: 20px;
-        }
-      }
     </style>
   </head>
-  <body class="fade-out">
-    <!-- Header matching index.html -->
-    <header>
-      <a href="index.html" class="header-logo" style="text-decoration: none; color: white;">
-        <img src="images/Puntod%20Finder%20Logo.png" alt="Puntod Finder Logo">
-        <h2 style="font-size: 18px; margin: 0;">Puntod Finder</h2>
-      </a>
-      <nav class="header-nav">
-        <a class="nav-link" href="about.html">
-          <img src="images/about-us.png" alt="About Us Icon">
-          <span class="nav-tooltip">About Us</span>
-        </a>
-        <a class="nav-link" href="contact.html">
-          <img src="images/contact-us.png" alt="Contact Us Icon">
-          <span class="nav-tooltip">Contact Us</span>
-        </a>
-        <a class="nav-link" href="admin.html">
-          <img src="images/administrator.png" alt="Admin Icon">
-          <span class="nav-tooltip">Admin</span>
-        </a>
-      </nav>
-    </header>
-
-    <div class="map-container">
-      <div id="loader" class="loader">Loading map data...</div>
-      <div id="map"></div>
-      <div class="search-container">
-        <select id="block-search">
-          <option value="">Select a Block...</option>
-        </select>
-      </div>
-      <div class="location-button" id="location-button">
-        <img src="images/myLocation.png" alt="Location" width="23.5">
-      </div>
-      <div class="directions-container" id="directions-container"></div>
-      <div class="location-error" id="location-error">
-        Unable to access your location. Please enable location services and try again.
-      </div>
-      <div class="user-status" id="user-status"></div>
+  <body>
+    <div id="loader" class="loader">Loading map data...</div>
+    <div id="map"></div>
+    <div class="search-container">
+      <select id="block-search">
+        <option value="">Select a Block...</option>
+      </select>
     </div>
+    <div class="location-button" id="location-button">
+      <img src="images/myLocation.png" alt="Location" width="23.5">
+    </div>
+    <div class="directions-container" id="directions-container"></div>
+    <div class="location-error" id="location-error">
+      Unable to access your location. Please enable location services and try again.
+    </div>
+    <div class="user-status" id="user-status"></div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -275,25 +164,6 @@
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
     <script>
-      // Fade in on page load
-      window.addEventListener('DOMContentLoaded', () => {
-        document.body.classList.add('fade-in');
-        document.body.classList.remove('fade-out');
-      });
-
-      // Fade out on link click
-      document.querySelectorAll('a.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          const destination = this.href;
-          document.body.classList.remove('fade-in');
-          document.body.classList.add('fade-out');
-          setTimeout(() => {
-            window.location.href = destination;
-          }, 500); // matches CSS transition
-        });
-      });
-
       // Initialize the map
       var map = L.map("map").setView([13.9328, 121.4065], 18);
 

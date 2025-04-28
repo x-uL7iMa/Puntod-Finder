@@ -9,26 +9,11 @@
 </head>
 
 <body>
-  <!-- Login Form -->
-  <div class="login-container" id="loginContainer">
-    <div class="login-form">
-      <h2>Admin Login</h2>
-      <div class="login-message" id="loginMessage"></div>
-      <input type="text" id="username" placeholder="Username" />
-      <input type="password" id="password" placeholder="Password" />
-      <button id="loginButton">Login</button>
-    </div>
-  </div>
-
-  <!-- Dashboard (initially hidden) -->
-  <div class="dashboard" id="dashboard" style="display: none;">
+  <div class="dashboard">
     <div class="sidebar">
       <h2>Admin Panel</h2>
       <a href="#" class="nav-link active" onclick="showSection('records')" data-section="records">Records</a>
       <a href="#" class="nav-link" onclick="showSection('lotStatus')" data-section="lotStatus">Lot Status</a>
-      <div class="sidebar-bottom">
-        <a href="#" class="nav-link logout" onclick="logout()">Logout</a>
-      </div>
     </div>
     <div class="main-content">
       <div class="lotStatus-section" style="display: none;">
@@ -123,8 +108,7 @@
         </button>
       </div>
     </div>
-  </div>
-  <script src="/Script/admin.js"></script>
+    <script src="/Script/admin.js"></script>
 </body>
 
 </html>
