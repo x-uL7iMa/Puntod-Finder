@@ -1,6 +1,90 @@
-const API_URL = "https://sheetdb.io/api/v1/z7ehd71y8bt7r";
+const API_URL = "https://sheetdb.io/api/v1/ao4bw50h75c36";
 let currentEditingRow = null;
 const topBar = document.getElementById("topBar");
+
+// Login functionality
+document.addEventListener("DOMContentLoaded", function() {
+  // Check if user is already logged in
+  const isLoggedIn = sessionStorage.getItem("adminLoggedIn");
+  if (isLoggedIn === "true") {
+    showDashboard();
+  }
+
+  // Setup login button
+  document.getElementById("loginButton").addEventListener("click", attemptLogin);
+  
+  // Allow login on Enter key
+  document.getElementById("password").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+      attemptLogin();
+    }
+  });
+});
+
+function attemptLogin() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  
+  if (!username || !password) {
+    showLoginMessage("Please enter both username and password", "error");
+    return;
+  }
+  
+  // Fetch accounts from the Accounts sheet
+  fetch(`${API_URL}?sheet=Accounts`)
+    .then(res => res.json())
+    .then(accounts => {
+      const validAccount = accounts.find(acc => 
+        acc.Username === username && acc.Password === password
+      );
+      
+      if (validAccount) {
+        // Store login status in session storage
+        sessionStorage.setItem("adminLoggedIn", "true");
+        sessionStorage.setItem("adminUsername", username);
+        showDashboard();
+      } else {
+        showLoginMessage("Invalid username or password", "error");
+      }
+    })
+    .catch(err => {
+      console.error("Login error:", err);
+      showLoginMessage("Error during login. Please try again.", "error");
+    });
+}
+
+function showLoginMessage(message, type) {
+  const msgBox = document.getElementById("loginMessage");
+  msgBox.textContent = message;
+  msgBox.className = `login-message ${type}`;
+  
+  setTimeout(() => {
+    msgBox.textContent = "";
+    msgBox.className = "login-message";
+  }, 3000);
+}
+
+function showDashboard() {
+  document.getElementById("loginContainer").style.display = "none";
+  document.getElementById("dashboard").style.display = "flex";
+  fetchRecords();
+  setupSearchFilters();
+  setupSortArrows();
+}
+
+function logout() {
+  // Clear session storage
+  sessionStorage.removeItem("adminLoggedIn");
+  sessionStorage.removeItem("adminUsername");
+  
+  // Show login screen
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("loginContainer").style.display = "flex";
+  
+  // Clear login form
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+}
 
 function fetchRecords() {
   fetch(API_URL)
@@ -12,7 +96,7 @@ function fetchRecords() {
 function displayRecords(data) {
   const tableBody = document.querySelector("#recordsTable tbody");
   tableBody.innerHTML = "";
-  data.forEach((record, index) => {
+  data.forEach((record) => {
     const row = document.createElement("tr");
     row.dataset.identifier = encodeURIComponent(record.Name);
     row.innerHTML = `
@@ -171,7 +255,7 @@ function submitNewRecord() {
     body: JSON.stringify(data),
   })
     .then(() => {
-      closeAddModal();
+      closeAddForm();
       fetchRecords();
       showMessage("Record added.", "success");
     })
@@ -282,8 +366,6 @@ function fetchLotStatus() {
     .catch(() => showMessage("Error loading lot status.", "error"));
 }
 
-setupLotStatusFilters();
-
 function setupLotStatusFilters() {
   const blockInput = document.getElementById("searchBlockLS");
   const lotInput = document.getElementById("searchLotLS");
@@ -311,6 +393,7 @@ function setupLotStatusFilters() {
   });
 }
 
-fetchRecords();
-setupSearchFilters();
-setupSortArrows();
+// Initialize application
+document.addEventListener("DOMContentLoaded", function() {
+  setupLotStatusFilters();
+});

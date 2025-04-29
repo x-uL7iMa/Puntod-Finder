@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contact Us - Puntod Finder</title>
+    <style>
+        /* --- General Styles --- */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            /* Background from index.html */
+            background: url("images/background2.png") no-repeat center center fixed;
+            background-size: cover;
+            color: #fff; /* Default text color for header/background */
+            text-shadow: .3rem .3rem .5rem #000; /* Default text shadow */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            opacity: 0; /* Initial state for fade-in */
+            transition: opacity 0.5s ease;
+        }
+
+        body.fade-out {
+            opacity: 0;
+        }
+
+        body.fade-in {
+            opacity: 1;
+        }
+
+        /* --- Header Styles (Copied from index.html) --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 2.5rem;
+            background-color: #3f6a5400; /* Transparent background */
+            color: white;
+            height: 2rem; /* Adjusted height - Consistent with admin.html */
+            flex-shrink: 0; /* Prevent header from shrinking */
+            z-index: 10; /* Ensure header is above main content */
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none; /* Remove default link underline */
+            color: white; /* Set text color */
+        }
+
+        .header-logo img {
+            height: 5rem;
+            margin-right: 1rem;
+            max-height: 80px; /* Match header height */
+            width: auto; /* Maintain aspect ratio */
+        }
+
+        .header-logo h2 {
+            font-size: 3rem; /* Adjusted font size - Consistent with your latest version */
+            margin: 0; /* Remove default h2 margin */
+            text-shadow: .2rem .2rem .4rem #000; /* Adjust text shadow for smaller text */
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 7.5rem; /* Adjusted gap - Consistent with your latest version */
+            margin-right: 2rem; /* Adjusted margin - Consistent with your latest version */
+        }
+
+        .nav-link {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            text-shadow: none; /* Remove text shadow for small text */
+        }
+
+        .nav-link img {
+            height: 2.5rem;
+            width: 2.5rem;
+            z-index: 1; /* Ensure icon is above the blur */
+        }
+
+        .nav-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: -1.8rem;
+            background-color: #3f6a54;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem; /* Adjusted font size */
+            transform: translateY(5px);
+            z-index: 10; /* Ensure tooltip is above other elements */
+        }
+
+        .nav-link:hover .nav-tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0px);
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: blur(2px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        /* Blur background images (using placeholder paths) */
+        .nav-link[href*="about"]::before {
+            background-image: url('images/about-us.png');
+        }
+
+        .nav-link[href*="contact"]::before {
+            background-image: url('images/contact-us.png');
+        }
+
+        .nav-link[href*="admin"]::before {
+            background-image: url('images/administrator.png');
+        }
+
+        /* --- Main Content Layout --- */
+        main {
+            flex: 1; /* Allow main content to take remaining vertical space */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align items to the top */
+            padding: 2rem; /* Add padding around the content */
+            color: #333; /* Default text color for main content panels */
+             text-shadow: none; /* Remove text shadow in main content */
+        }
+
+        .contact-container {
+            display: flex;
+            width: 100%;
+            max-width: 1000px; /* Max width for the container */
+            flex-wrap: wrap; /* Allow panels to wrap on smaller screens */
+            gap: 2rem; /* Add gap between panels */
+            justify-content: center; /* Center panels when they wrap */
+        }
+
+        .contact-panel {
+            padding: 2rem;
+            flex: 1; /* Allow panels to grow and shrink */
+            min-width: 300px; /* Minimum width before stacking */
+            background-color: rgba(255, 255, 255, 0.5); /* 50% opacity white background */
+            border-radius: 8px; /* Apply border-radius to individual panels */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Apply box-shadow to individual panels */
+             display: flex; /* Use flexbox for internal panel layout */
+             flex-direction: column;
+        }
+
+        .contact-panel h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #3f6a54; /* Underline title */
+            padding-bottom: 0.5rem;
+        }
+
+        /* --- Admin Contact Info Styles --- */
+        .admin-contact-info ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+             flex-grow: 1; /* Allow the list to grow and push footer down if needed */
+        }
+
+        .admin-contact-info li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .admin-contact-info li svg {
+            margin-right: 1rem;
+            color: #3f6a54; /* Icon color */
+            flex-shrink: 0; /* Prevent icon from shrinking */
+        }
+
+        /* --- Contact Form Styles --- */
+        .contact-form form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem; /* Space between form elements */
+             flex-grow: 1; /* Allow the form to grow */
+        }
+
+        .contact-form label {
+            font-weight: bold;
+            margin-bottom: 0.2rem;
+            display: block; /* Ensure label is on its own line */
+            color: #2c3e50;
+        }
+
+        .contact-form input[type="text"],
+        .contact-form input[type="email"],
+        .contact-form select,
+        .contact-form textarea {
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 100%; /* Make inputs take full width */
+        }
+
+        .contact-form textarea {
+            resize: vertical; /* Allow vertical resizing */
+            min-height: 150px; /* Minimum height for message box */
+        }
+
+        .contact-form button {
+            padding: 1rem;
+            background-color: #3f6a54;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .contact-form button:hover {
+            background-color: #2c3e50;
+        }
+
+        /* --- Footer Styles --- */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white; /* Ensure footer text is white */
+            flex-shrink: 0; /* Prevent footer from shrinking */
+            margin-top: auto; /* Push footer to the bottom */
+        }
+
+         /* Message styles (copied from admin.html for consistency) */
+        .message {
+            margin-top: 1.5rem;
+            padding: 0.8rem;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: opacity 0.5s ease;
+        }
+
+        .message.success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+                height: auto;
+            }
+
+            .header-logo img {
+                height: 3rem;
+                max-height: none;
+            }
+             .header-logo h2 {
+                 font-size: 1.4rem;
+             }
+
+            .header-nav {
+                gap: 1rem;
+                margin-right: 0;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+             .nav-link {
+                 margin-bottom: 0.5rem;
+             }
+
+            main {
+                padding: 1rem; /* Reduce padding on smaller screens */
+                align-items: stretch; /* Stretch panels to fill width */
+            }
+
+            .contact-container {
+                flex-direction: column; /* Stack panels vertically */
+                gap: 1.5rem; /* Adjust gap when stacked */
+            }
+
+            .contact-panel {
+                padding: 1.5rem; /* Adjust panel padding */
+                min-width: auto; /* Remove min-width when stacked */
+            }
+
+             .admin-contact-info li {
+                 margin-bottom: 1rem; /* Reduce space between list items */
+                 font-size: 1rem;
+             }
+
+             .admin-contact-info li svg {
+                  margin-right: 0.8rem;
+             }
+
+             .contact-form form {
+                 gap: 0.8rem; /* Reduce gap in form */
+             }
+
+             .contact-form input[type="text"],
+             .contact-form input[type="email"],
+             .contact-form select,
+             .contact-form textarea {
+                 padding: 0.6rem; /* Reduce input padding */
+                 font-size: 0.9rem;
+             }
+
+             .contact-form button {
+                 padding: 0.8rem; /* Reduce button padding */
+                 font-size: 1rem;
+             }
+        }
+
+        @media (max-width: 500px) {
+             header {
+                 flex-direction: column; /* Stack header items */
+                 align-items: center;
+                 padding: 0.8rem 1rem;
+             }
+             .header-logo {
+                 margin-bottom: 0.8rem;
+             }
+             .header-nav {
+                 margin-top: 0.5rem;
+                 gap: 0.8rem;
+             }
+
+            .contact-panel {
+                padding: 1rem; /* Further reduce panel padding */
+            }
+
+             .admin-contact-info li {
+                 margin-bottom: 0.8rem;
+             }
+
+             .contact-form form {
+                 gap: 0.6rem;
+             }
+
+             .contact-form input[type="text"],
+             .contact-form input[type="email"],
+             .contact-form select,
+             .contact-form textarea {
+                 padding: 0.5rem;
+             }
+        }
+    </style>
+</head>
+<body class="fade-out">
+    <header>
+        <a href="index.html" class="header-logo">
+            <img src="images/Puntod%20Finder%20Logo.png" alt="Puntod Finder Logo">
+            <h2 style="font-size: 3rem;">Puntod Finder</h2>
+        </a>
+        <nav class="header-nav">
+            <a class="nav-link" href="about.html">
+                <img src="images/about-us.png" alt="About Us Icon">
+                <span class="nav-tooltip">About Us</span>
+            </a>
+            <a class="nav-link" href="contact.html">
+                <img src="images/contact-us.png" alt="Contact Us Icon">
+                <span class="nav-tooltip">Contact Us</span>
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="contact-container">
+            <div class="contact-panel admin-contact-info">
+                <h2>ADMIN CONTACT INFORMATION</h2>
+                <ul>
+                    <li>
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        Email: info@puntodfinder.com
+                    </li>
+                    <li>
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone"><path d="M22 16.92v3a2 2 0 0 1-2.18 2.02 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-1.73 2.91 11.5 11.5 0 0 0 6 6 2 2 0 0 1 2.91-1.73 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Phone Number: +63 912 345 6789
+                    </li>
+                    <li>
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M18 8A6 6 0 0 0 6 8c0 7 6 15 6 15s6-8 6-15z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Office Address: 123 Memorial Park Rd, San Pedro, Laguna, Philippines
+                    </li>
+                </ul>
+            </div>
+
+            <div class="contact-panel contact-form">
+                <h2>CONTACT FORM</h2>
+                <form id="contactForm">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="subject">Subject:</label>
+                    <select id="subject" name="subject" required>
+                        <option value="">-- Select Subject --</option>
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="Record Correction">Record Correction</option>
+                        <option value="Lot Status Inquiry">Lot Status Inquiry</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" required></textarea>
+
+                    <button type="submit">Submit</button>
+                </form>
+                <div id="formMessage" class="message" style="display: none;"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>© 2025 Puntod Finder</footer>
+
+    <script>
+        // --- Configuration ---
+        // IMPORTANT: Replace with the BASE API URL for your SheetDB project
+        // This is the part before the sheet name, e.g., "https://sheetdb.io/api/v1/YOUR_UNIQUE_HASH"
+        const BASE_API_URL = "https://sheetdb.io/api/v1/ao4bw50h75c36"; // <-- Replace with your BASE SheetDB URL
+
+        // The name of the sheet in your Google Sheet where contact form submissions should go
+        const CONTACT_SHEET_NAME = "Contact"; // <-- Ensure this matches your sheet name exactly
+
+        // Construct the full API URL for the contact sheet
+        const CONTACT_API_URL = `${BASE_API_URL}?sheet=${CONTACT_SHEET_NAME}`;
+
+
+        // --- Fade-in/Fade-out Transition ---
+        // Fade in on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('fade-in');
+            document.body.classList.remove('fade-out');
+        });
+
+        // Fade out on link click (excluding mailto, tel links)
+        document.querySelectorAll('a:not([href^="mailto:"]):not([href^="tel:"])').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Check if the link is internal (not external URL)
+                if (this.hostname === window.location.hostname) {
+                    e.preventDefault();
+                    const destination = this.href;
+                    document.body.classList.remove('fade-in');
+                    document.body.classList.add('fade-out');
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 500); // matches CSS transition
+                }
+            });
+        });
+
+         // --- Contact Form Submission (SheetDB Integration) ---
+         const contactForm = document.getElementById('contactForm');
+         const formMessage = document.getElementById('formMessage');
+
+         contactForm.addEventListener('submit', function(e) {
+             e.preventDefault(); // Prevent actual form submission
+
+             // Get the current date and time
+             const now = new Date();
+             // Format the timestamp (e.g., "4/30/2025, 5:00:00 AM")
+             const timestamp = now.toLocaleString();
+
+             // Collect form data
+             const formData = {
+                 Name: document.getElementById('name').value.trim(),
+                 Email: document.getElementById('email').value.trim(),
+                 Subject: document.getElementById('subject').value, // Subject is from a select, no trim needed
+                 Message: document.getElementById('message').value.trim(),
+                 Timestamp: timestamp // Add the client-generated timestamp
+                 // SheetDB will still automatically add 'id' if the column exists
+             };
+
+             // Basic validation
+             if (!formData.Name || !formData.Email || !formData.Subject || !formData.Message) {
+                 showFormMessage('Please fill in all required fields.', 'error');
+                 return;
+             }
+
+             // Disable the submit button to prevent multiple submissions
+             const submitButton = contactForm.querySelector('button[type="submit"]');
+             submitButton.disabled = true;
+             submitButton.textContent = 'Sending...';
+
+
+             // Send data to SheetDB using fetch (consistent method with admin.html)
+             // Use the constructed CONTACT_API_URL which includes the sheet name
+             fetch(CONTACT_API_URL, {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json'
+                 },
+                 body: JSON.stringify({
+                     data: formData // Data is wrapped in a 'data' key, same as admin.html
+                 })
+             })
+             .then(response => {
+                 if (!response.ok) {
+                     // Handle API errors (e.g., sheet not found, permission issues)
+                     // Try to parse error message from response body if available
+                     return response.json().then(err => {
+                         const errorMessage = err.message || JSON.stringify(err) || 'Failed to send message';
+                         throw new Error(`HTTP error! status: ${response.status}, message: ${errorMessage}`);
+                     }).catch(() => {
+                          // If JSON parsing fails, throw a generic error with status
+                          throw new Error(`HTTP error! status: ${response.status}`);
+                     });
+                 }
+                 // SheetDB POST usually returns the added row data on success
+                 return response.json();
+             })
+             .then(data => {
+                 console.log('Message sent successfully:', data);
+                 showFormMessage('Thank you for your message! We will get back to you shortly.', 'success');
+                 contactForm.reset(); // Clear the form on success
+             })
+             .catch(error => {
+                 console.error('Error sending message:', error);
+                 // Show a more user-friendly error message
+                 showFormMessage(`Error sending message. Please check the API URL and sheet name. Details: ${error.message}`, 'error');
+             })
+             .finally(() => {
+                 // Re-enable the submit button
+                 submitButton.disabled = false;
+                 submitButton.textContent = 'Submit';
+             });
+         });
+
+         // Helper function to show form messages
+         function showFormMessage(text, type) {
+             formMessage.textContent = text;
+             formMessage.className = `message ${type}`;
+             formMessage.style.display = 'block'; // Ensure the message is displayed
+
+             // Hide the message after a few seconds
+             setTimeout(() => {
+                 formMessage.textContent = "";
+                 formMessage.className = "message";
+                 formMessage.style.display = 'none'; // Hide the message
+             }, 5000); // Message visible for 5 seconds
+         }
+
+    </script>
+
+</body>
+</html>

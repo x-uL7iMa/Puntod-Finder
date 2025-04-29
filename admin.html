@@ -2,129 +2,1616 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin Dashboard - Puntod Finder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/Style/admin.css" />
+    <meta charset="UTF-8" />
+    <title>Admin Dashboard - Puntod Finder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        /* --- General Styles --- */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            /* Background from index.html */
+            background: url("images/background.png") no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            text-shadow: .3rem .3rem .5rem #000;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Header Styles (Copied from index.html) --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 2.5rem;
+            background-color: #3f6a5400;
+            color: white;
+            height: 6rem;
+            /* Adjusted height */
+            flex-shrink: 0;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+        }
+
+        .header-logo img {
+            height: 5rem;
+            margin-right: 1rem;
+            max-height: 80px;
+        }
+
+        .header-logo h2 {
+            font-size: 3rem;
+            /* Adjusted font size */
+            margin: 0;
+            /* Remove default h2 margin */
+            text-shadow: .2rem .2rem .4rem #000;
+            /* Adjust text shadow for smaller text */
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 7.5rem;
+            /* Reduced gap for better spacing */
+            margin-right: 2rem;
+            /* Adjusted margin */
+        }
+
+        .nav-link {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            text-shadow: none;
+            /* Remove text shadow for small text */
+        }
+
+        .nav-link img {
+            height: 2.5rem;
+            width: 2.5rem;
+            z-index: 1;
+            /* Ensure icon is above the blur */
+        }
+
+        .nav-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: -1.8rem;
+            background-color: #3f6a54;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            /* Adjusted font size */
+            transform: translateY(5px);
+            z-index: 10;
+            /* Ensure tooltip is above other elements */
+        }
+
+        .nav-link:hover .nav-tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0px);
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: blur(2px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        /* Blur background images */
+        .nav-link[href*="about"]::before {
+            background-image: url('images/about-us.png');
+        }
+
+        .nav-link[href*="contact"]::before {
+            background-image: url('images/contact-us.png');
+        }
+
+        .nav-link[href*="admin"]::before {
+            background-image: url('images/administrator.png');
+        }
+
+        /* --- Main Layout & Login/Dashboard Views --- */
+        .login-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* REMOVED: background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+             /* The body background will now show behind the login form */
+        }
+
+        .dashboard {
+            display: flex;
+            flex-grow: 1;
+            /* Override body background and text shadow for dashboard view */
+            background: #f4f4f4;
+            color: initial;
+            text-shadow: none;
+        }
+
+
+        /* --- Sidebar Styles --- */
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-top {
+            position: sticky;
+            top: 0;
+            background: #2c3e50;
+            padding: 2rem 1rem 1rem;
+            z-index: 5;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #34495e;
+        }
+
+        .sidebar-links {
+            flex-grow: 1;
+            padding: 0 1rem;
+        }
+
+        .sidebar-bottom {
+            position: sticky;
+            bottom: 0;
+            background: #2c3e50;
+            padding: 1rem;
+            z-index: 5;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            margin-left: 220px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- Table and Controls --- */
+        .records-section,
+        .lotStatus-section,
+        .contactSubmissions-section { /* Added new section class */
+            display: none;
+        }
+
+        .records-section {
+            display: block; /* Default active section */
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 2rem;
+        }
+
+
+        .filter-row-wrapper {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-inputs {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            flex-grow: 1;
+        }
+
+        .filter-inputs input[type="text"] {
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            flex: 1;
+            min-width: 150px;
+        }
+
+
+        table {
+            width: 100%;
+            max-width: 100%;
+            border-collapse: collapse;
+            background: white;
+            table-layout: fixed;
+            margin-top: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #333;
+            /* Set table text color */
+        }
+
+        th,
+        td {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            text-align: left;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+            position: relative;
+            padding-right: 1.5rem;
+            cursor: pointer;
+        }
+
+        th .sort-arrow {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            user-select: none;
+        }
+
+
+        button {
+            padding: 0.6rem 1rem;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .addButton {
+            background-color: #28a745;
+            white-space: nowrap;
+        }
+
+        .edit-cell {
+            text-align: center;
+            width: 60px;
+        }
+
+        .edit-button {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            color: #007bff;
+            transition: color 0.2s ease;
+        }
+
+        .edit-button:hover {
+            color: #0056b3;
+        }
+
+        .edit-button {
+            visibility: hidden;
+        }
+
+        tr:hover .edit-button {
+            visibility: visible;
+        }
+
+
+        .message {
+            margin-top: 1.5rem;
+            padding: 0.8rem;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: opacity 0.5s ease;
+        }
+
+        .message.success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* --- Modals (Add/Edit Forms) --- */
+        .modal {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 100vw;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            color: #333;
+            /* Set modal text color */
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .modal-content input[type="text"],
+        .modal-content input[type="date"] {
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .modal-content label {
+            font-weight: bold;
+            margin-top: 0.5rem;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .modal-content button {
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .modal-button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .modal-button-group button {
+            flex-grow: 1;
+            min-width: 100px;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-button-group .button-spacing {
+            flex-grow: 2;
+            min-width: 10px;
+        }
+
+
+        .modal-button-group button.save-button {
+            background: #27ae60;
+        }
+
+        .modal-button-group button.delete-button {
+            background: #e74c3c;
+        }
+
+        .modal-button-group button.cancel-button {
+            background: #c0392b;
+        }
+
+
+        /* --- Lot Status Specific Styles --- */
+        .status-cell {
+            font-weight: bold;
+            text-align: center;
+            padding: 0.4rem;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .status-occupied {
+            background-color: #e74c3c;
+        }
+
+        .status-available {
+            background-color: #27ae60;
+        }
+
+        /* --- Admin Login Styles --- */
+
+        /* Login Container already modified for flex layout */
+
+        /* Login Form */
+        .login-form {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            max-width: 90%;
+            transition: all 0.3s ease;
+            color: #333;
+            /* Set form text color */
+        }
+
+        .login-form:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .login-form h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .login-form h2:after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            height: 4px;
+            width: 50px;
+            border-radius: 2px;
+            background-color: #667eea;
+        }
+
+        /* Login Form Fields */
+        .login-form input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+
+        .login-form input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-form button:hover {
+            background: linear-gradient(135deg, #5a70d6 0%, #6a4492 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-form button:active {
+            transform: translateY(0);
+        }
+
+        /* Login Message */
+        .login-message {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .login-message.error {
+            background-color: #ffe6e6;
+            color: #d63031;
+            border: 1px solid #ffb8b8;
+        }
+
+        .login-message.success {
+            background-color: #e6ffee;
+            color: #00b894;
+            border: 1px solid #b8ffdd;
+        }
+
+        /* --- Responsive adjustments --- */
+        @media (max-width: 768px) {
+            /* Adjust main layout on smaller screens */
+            body {
+                flex-direction: column;
+            }
+
+            header {
+                padding: 1rem;
+                height: auto;
+                /* Allow height to adjust */
+            }
+
+            .header-logo img {
+                height: 3rem;
+                /* Reduce logo size */
+                max-height: none;
+            }
+
+            .header-logo h2 {
+                font-size: 1.4rem;
+            }
+
+            .header-nav {
+                gap: 1rem;
+                /* Further reduce gap */
+                margin-right: 0;
+                flex-wrap: wrap;
+                /* Allow nav items to wrap */
+                justify-content: center;
+                /* Center nav items when wrapped */
+            }
+
+            .nav-link {
+                margin-bottom: 0.5rem;
+            }
+
+
+            /* Sidebar remains fixed in this design, media query in previous step handled smaller screen sidebar */
+            .sidebar {
+                width: 220px;
+                /* Keep fixed width for larger mobile/tablet */
+                position: fixed;
+                /* Re-apply if necessary */
+            }
+
+            /* Adjust main content margin for fixed sidebar */
+            .main-content {
+                margin-left: 220px;
+                /* Keep margin */
+                padding: 1rem;
+                /* Reduce padding */
+            }
+
+
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-inputs {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .filter-inputs input[type="text"] {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .addButton {
+                width: 100%;
+            }
+
+            .modal-button-group button {
+                flex-grow: 1;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .login-form {
+                padding: 30px 20px;
+            }
+
+            .login-form input,
+            .login-form button {
+                padding: 12px;
+            }
+
+            /* Sidebar becomes static/row on very small screens */
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                overflow-y: visible;
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 1rem;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .sidebar-top,
+            .sidebar-bottom,
+            .sidebar-links {
+                position: static;
+                padding: 0;
+                background: none;
+                z-index: auto;
+                flex-shrink: 1;
+                margin-top: 0;
+            }
+
+            .sidebar h2 {
+                text-align: left;
+                margin-right: 1rem;
+                margin-bottom: 0;
+            }
+
+            .sidebar-links {
+                display: flex;
+                gap: 1rem;
+                flex-grow: 1;
+                flex-wrap: wrap;
+            }
+
+            .sidebar a {
+                margin: 0.5rem 0;
+            }
+
+            .sidebar-bottom {
+                margin-left: auto;
+                /* Push logout to the right */
+            }
+
+            .sidebar-bottom a {
+                width: auto;
+                /* Auto width for mobile */
+            }
+
+
+            .main-content {
+                margin-left: 0;
+                /* Remove margin when sidebar is static */
+                padding-top: 1rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <!-- Login Form -->
-  <div class="login-container" id="loginContainer">
-    <div class="login-form">
-      <h2>Admin Login</h2>
-      <div class="login-message" id="loginMessage"></div>
-      <input type="text" id="username" placeholder="Username" />
-      <input type="password" id="password" placeholder="Password" />
-      <button id="loginButton">Login</button>
-    </div>
-  </div>
+    <header id="loginHeader">
+        <a href="index.html" class="header-logo">
+            <img src="images/Puntod%20Finder%20Logo.png" alt="Puntod Finder Logo">
+            <h2>Puntod Finder</h2>
+        </a>
+        <nav class="header-nav">
+            <a class="nav-link" href="about.html">
+                <img src="images/about-us.png" alt="About Us Icon">
+                <span class="nav-tooltip">About Us</span>
+            </a>
+            <a class="nav-link" href="contact.html">
+                <img src="images/contact-us.png" alt="Contact Us Icon">
+                <span class="nav-tooltip">Contact Us</span>
+            </a>
+        </nav>
+    </header>
 
-  <!-- Dashboard (initially hidden) -->
-  <div class="dashboard" id="dashboard" style="display: none;">
-    <div class="sidebar">
-      <h2>Admin Panel</h2>
-      <a href="#" class="nav-link active" onclick="showSection('records')" data-section="records">Records</a>
-      <a href="#" class="nav-link" onclick="showSection('lotStatus')" data-section="lotStatus">Lot Status</a>
-      <div class="sidebar-bottom">
-        <a href="#" class="nav-link logout" onclick="logout()">Logout</a>
-      </div>
-    </div>
-    <div class="main-content">
-      <div class="lotStatus-section" style="display: none;">
-        <h1>Lot Status</h1>
-        <div class="filter-row-wrapper">
-          <div class="filter-row">
-            <div class="filter-inputs">
-              <input type="text" id="searchBlockLS" class="column-search" placeholder="Search Block">
-              <input type="text" id="searchLotLS" class="column-search" placeholder="Search Lot">
-              <input type="text" id="searchStatusLS" class="column-search" placeholder="Search Status">
-            </div>
-          </div>
+
+    <div class="login-container" id="loginContainer">
+        <div class="login-form">
+            <h2>Admin Login</h2>
+            <div class="login-message" id="loginMessage"></div>
+            <input type="text" id="username" placeholder="Username" />
+            <input type="password" id="password" placeholder="Password" />
+            <button id="loginButton">Login</button>
         </div>
-        <table id="lotStatusTable">
-          <thead>
-            <tr>
-              <th>Block</th>
-              <th>Lot</th>
-              <th>Status</th>
-              <th>Latitude</th>
-              <th>Longitude</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div class="records-section">
-        <div class="top-bar" id="topBar">
-          <h1 class="title-row">
-            <span>Manage Tomb Records</span>
-          </h1>
-          <div class="filter-row-wrapper">
-            <div class="filter-row">
-              <div class="filter-inputs">
-                <input type="text" id="searchName" placeholder="Search by Name" />
-                <input type="text" id="searchBlock" placeholder="Search by Block" />
-                <input type="text" id="searchLot" placeholder="Search by Lot" />
-              </div>
-              <div class="add-button-wrapper">
-                <button class="addButton" onclick="openAddForm()">+ Add</button>
-              </div>
+    </div>
+
+    <div class="dashboard" id="dashboard" style="display: none;">
+        <div class="sidebar">
+            <div class="sidebar-top">
+                <h2 style="font-size: 1.5rem; padding-bottom: 50px;">Admin Panel</h2>
+                <a href="#" class="nav-link active" style="font-size: 1rem;" onclick="showSection('records')" data-section="records">Records</a>
+                <a href="#" class="nav-link" style="font-size: 1rem;" onclick="showSection('lotStatus')" data-section="lotStatus">Lot Status</a>
+                <a href="#" class="nav-link" style="font-size: 1rem;" onclick="showSection('contactSubmissions')" data-section="contactSubmissions">Contact Submissions</a>
             </div>
-          </div>
-          <table id="recordsTable">
-            <thead>
-              <tr>
-                <th class="checkbox-cell"></th>
-                <th>Name <span class="sort-arrow" data-column="1">▼</span></th>
-                <th>Block <span class="sort-arrow" data-column="2">▼</span></th>
-                <th>Lot <span class="sort-arrow" data-column="3">▼</span></th>
-                <th>Date of Birth</th>
-                <th>Date of Death</th>
-                <th class="edit-cell"></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div id="message" class="message"></div>
+            <div class="sidebar-links">
+                </div>
+            <div class="sidebar-bottom">
+                <a href="#" class="nav-link logout" onclick="logout()" style="color: red; text-align: center; font-size: 1.5rem;">Logout</a>
+            </div>
         </div>
-      </div>
+
+        <div class="main-content">
+            <div class="lotStatus-section">
+                <div class="section-header">
+                    <h1 class="section-title">Lot Status</h1>
+                </div>
+                <div class="filter-row-wrapper">
+                    <div class="filter-row">
+                        <div class="filter-inputs">
+                            <input type="text" id="searchBlockLS" placeholder="Search Block">
+                            <input type="text" id="searchLotLS" placeholder="Search Lot">
+                            <input type="text" id="searchStatusLS" placeholder="Search Status">
+                        </div>
+                    </div>
+                </div>
+                <table id="lotStatusTable">
+                    <thead>
+                        <tr>
+                            <th>Block</th>
+                            <th>Lot</th>
+                            <th>Status</th>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="records-section">
+                <div class="section-header">
+                    <h1 class="section-title">Manage Tomb Records</h1>
+                </div>
+                <div class="filter-row-wrapper">
+                    <div class="filter-row">
+                        <div class="filter-inputs">
+                            <input type="text" id="searchName" placeholder="Search by Name" />
+                            <input type="text" id="searchBlock" placeholder="Search by Block" />
+                            <input type="text" id="searchLot" placeholder="Search by Lot" />
+                        </div>
+                        <button class="addButton" onclick="openAddForm()">+ Add Record</button>
+                    </div>
+                </div>
+                <table id="recordsTable">
+                    <thead>
+                        <tr>
+                            <th>Name <span class="sort-arrow" data-column="0">▼</span></th>
+                            <th>Block <span class="sort-arrow" data-column="1">▼</span></th>
+                            <th>Lot <span class="sort-arrow" data-column="2">▼</span></th>
+                            <th>Date of Birth</th>
+                            <th>Date of Death</th>
+                            <th class="edit-cell"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div id="message" class="message"></div>
+            </div>
+
+            <div class="contactSubmissions-section">
+                <div class="section-header">
+                    <h1 class="section-title">Contact Submissions</h1>
+                </div>
+                <div class="filter-row-wrapper">
+                    <div class="filter-row">
+                        <div class="filter-inputs">
+                            <input type="text" id="searchTimestampCS" placeholder="Search Timestamp">
+                            <input type="text" id="searchNameCS" placeholder="Search Name">
+                            <input type="text" id="searchEmailCS" placeholder="Search Email">
+                            <input type="text" id="searchSubjectCS" placeholder="Search Subject">
+                            </div>
+                    </div>
+                </div>
+                <table id="contactSubmissionsTable">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+
+        </div>
+
+        <div class="modal" id="addForm">
+            <div class="modal-content">
+                <h3>Add New Record</h3>
+                <label for="addName">Name</label>
+                <input type="text" id="addName" placeholder="Name" />
+                <label for="addBlock">Block</label>
+                <input type="text" id="addBlock" placeholder="Block" />
+                <label for="addLot">Lot</label>
+                <input type="text" id="addLot" placeholder="Lot" />
+                <label for="addDOB">Date of Birth</label>
+                <input type="date" id="addDOB" />
+                <label for="addDOD">Date of Death</label>
+                <input type="date" id="addDOD" />
+                <div class="modal-button-group">
+                    <button class="save-button" onclick="submitNewRecord()">Add Record</button>
+                    <button class="cancel-button" onclick="closeAddForm()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="editForm">
+            <div class="modal-content">
+                <h3>Edit Record</h3>
+                <input type="hidden" id="editRecordId" />
+                <label for="editName">Name</label>
+                <input type="text" id="editName" placeholder="Name" />
+                <label for="editBlock">Block</label>
+                <input type="text" id="editBlock" placeholder="Block" />
+                <label for="editLot">Lot</label>
+                <input type="text" id="editLot" placeholder="Lot" />
+                <label for="editDOB">Date of Birth</label>
+                <input type="date" id="editDOB" />
+                <label for="editDOD">Date of Death</label>
+                <input type="date" id="editDOD" />
+                <div class="modal-button-group">
+                    <button class="delete-button" onclick="deleteRecord()">Delete</button>
+                    <div class="button-spacing"></div>
+                    <button class="save-button" onclick="submitEdit()">💾 Save</button>
+                    <button class="cancel-button" onclick="closeEditForm()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form" id="addForm">
-      <div class="form-content">
-        <h3>Add New Record</h3>
-        <input type="text" id="addName" placeholder="Name" />
-        <input type="text" id="addBlock" placeholder="Block" />
-        <input type="text" id="addLot" placeholder="Lot" />
-        <label for="addDOB">Date of Birth</label>
-        <input type="date" id="addDOB" />
-        <label for="addDOD">Date of Death</label>
-        <input type="date" id="addDOD" />
-        <button onclick="submitNewRecord()">Add Record</button>
-        <button onclick="closeAddForm()" style="background: #c0392b">
-          Cancel
-        </button>
-      </div>
-    </div>
-    <div class="form" id="editForm">
-      <div class="form-content">
-        <h3>Edit Record</h3>
-        <input type="hidden" id="editIdentifier" />
-        <input type="text" id="editName" placeholder="Name" />
-        <input type="text" id="editBlock" placeholder="Block" />
-        <input type="text" id="editLot" placeholder="Lot" />
-        <label for="editDOB">Date of Birth</label>
-        <input type="date" id="editDOB" />
-        <label for="editDOD">Date of Death</label>
-        <input type="date" id="editDOD" />
-        <button onclick="submitEdit()">💾 Save</button>
-        <button onclick="closeEditForm()" style="background: #c0392b">
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-  <script src="/Script/admin.js"></script>
+
+    <script>
+        // --- Configuration ---
+        const API_URL = "https://sheetdb.io/api/v1/ao4bw50h75c36";
+        const RECORDS_SHEET = "TombRecords"; // Assuming 'Records' is the default sheet
+        const LOT_STATUS_SHEET = "LotStatus"; // Assuming 'LotStatus' is the sheet name
+        const ACCOUNTS_SHEET = "Accounts"; // Assuming 'Accounts' is the sheet name
+        const CONTACT_SHEET = "Contact"; // New: Sheet name for contact submissions
+        const ID_COLUMN_NAME = "id"; // The name of your unique ID column in the SheetDB API
+
+
+        // --- DOM Elements ---
+        const loginHeader = document.getElementById("loginHeader"); // Added header element
+        const loginContainer = document.getElementById("loginContainer");
+        const dashboard = document.getElementById("dashboard");
+        const loginMessage = document.getElementById("loginMessage");
+        const usernameInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const loginButton = document.getElementById("loginButton");
+
+        const recordsSection = document.querySelector(".records-section");
+        const lotStatusSection = document.querySelector(".lotStatus-section");
+        const contactSubmissionsSection = document.querySelector(".contactSubmissions-section"); // New: Contact Submissions section element
+
+        const recordsTableBody = document.querySelector("#recordsTable tbody");
+        const lotStatusTableBody = document.querySelector("#lotStatusTable tbody");
+        const contactSubmissionsTableBody = document.querySelector("#contactSubmissionsTable tbody"); // New: Contact Submissions table body
+
+        const recordMessage = document.getElementById("message"); // Used for all section messages for now
+
+        const addFormModal = document.getElementById("addForm");
+        const addNameInput = document.getElementById("addName");
+        const addBlockInput = document.getElementById("addBlock");
+        const addLotInput = document.getElementById("addLot");
+        const addDOBInput = document.getElementById("addDOB");
+        const addDODInput = document.getElementById("addDOD");
+
+        const editFormModal = document.getElementById("editForm");
+        const editRecordIdInput = document.getElementById("editRecordId"); // Renamed from editIdentifier
+        const editNameInput = document.getElementById("editName");
+        const editBlockInput = document.getElementById("editBlock");
+        const editLotInput = document.getElementById("editLot");
+        const editDOBInput = document.getElementById("editDOB");
+        const editDODInput = document.getElementById("editDOD");
+
+
+        // --- State Variables ---
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc'; // 'asc' or 'desc'
+
+        // --- Initialization ---
+        document.addEventListener("DOMContentLoaded", function() {
+            checkLoginStatus();
+            setupEventListeners();
+            // Add login-view class to body on load if login form is initially visible
+            if (loginContainer.style.display !== 'none') {
+                loginHeader.style.display = 'flex'; // Ensure header is shown on login view
+            } else {
+                 loginHeader.style.display = 'none'; // Ensure header is hidden on dashboard view
+            }
+        });
+
+        function setupEventListeners() {
+            // Login button click
+            loginButton.addEventListener("click", attemptLogin);
+
+            // Login on Enter key press in password field
+            passwordInput.addEventListener("keypress", function(e) {
+                if (e.key === "Enter") {
+                    attemptLogin();
+                }
+            });
+
+            // Setup search filters for Records
+            document.getElementById("searchName").addEventListener("input", filterRecordsTable);
+            document.getElementById("searchBlock").addEventListener("input", filterRecordsTable);
+            document.getElementById("searchLot").addEventListener("input", filterRecordsTable);
+
+            // Setup search filters for Lot Status
+            document.getElementById("searchBlockLS").addEventListener("input", filterLotStatusTable);
+            document.getElementById("searchLotLS").addEventListener("input", filterLotStatusTable);
+            document.getElementById("searchStatusLS").addEventListener("input", filterLotStatusTable);
+
+            // New: Setup search filters for Contact Submissions
+            document.getElementById("searchTimestampCS").addEventListener("input", filterContactSubmissionsTable);
+            document.getElementById("searchNameCS").addEventListener("input", filterContactSubmissionsTable);
+            document.getElementById("searchEmailCS").addEventListener("input", filterContactSubmissionsTable);
+            document.getElementById("searchSubjectCS").addEventListener("input", filterContactSubmissionsTable);
+
+
+            // Setup sort arrows for Records
+            document.querySelectorAll("#recordsTable th .sort-arrow").forEach((arrow) => {
+                arrow.addEventListener("click", handleSort);
+            });
+
+        }
+
+        // --- Authentication Functions ---
+        function checkLoginStatus() {
+            const isLoggedIn = sessionStorage.getItem("adminLoggedIn");
+            if (isLoggedIn === "true") {
+                showDashboard();
+            } else {
+                showLoginForm();
+            }
+        }
+
+        function showLoginForm() {
+            loginHeader.style.display = 'flex'; // Show the header
+            loginContainer.style.display = "flex";
+            dashboard.style.display = "none";
+             // No need for login-view class if background is on body
+        }
+
+        function showDashboard() {
+            loginHeader.style.display = 'none'; // Hide the header
+            loginContainer.style.display = "none";
+            dashboard.style.display = "flex";
+             // Dashboard CSS handles its own background and text color
+            // Default to showing the records section on dashboard load
+            showSection('records');
+        }
+
+        function attemptLogin() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!username || !password) {
+                showLoginMessage("Please enter both username and password", "error");
+                return;
+            }
+
+            fetch(`${API_URL}?sheet=${ACCOUNTS_SHEET}`)
+                .then(res => {
+                    if (!res.ok) {
+                        // If the sheet doesn't exist or API key is wrong, this will catch it
+                        console.error("Failed to fetch accounts:", res.status, res.statusText);
+                        throw new Error(`Login failed: Could not reach authentication server.`);
+                    }
+                    return res.json();
+                })
+                .then(accounts => {
+                    // Ensure accounts is an array before searching
+                    if (!Array.isArray(accounts)) {
+                        console.error("Accounts data is not an array:", accounts);
+                        throw new Error("Login failed: Invalid accounts data received.");
+                    }
+                    const validAccount = accounts.find(acc =>
+                        acc.Username === username && acc.Password === password
+                    );
+
+                    if (validAccount) {
+                        sessionStorage.setItem("adminLoggedIn", "true");
+                        sessionStorage.setItem("adminUsername", username); // Optional: store username
+                        showDashboard();
+                    } else {
+                        showLoginMessage("Invalid username or password", "error");
+                    }
+                })
+                .catch(err => {
+                    console.error("Login error:", err);
+                    showLoginMessage(err.message || "Error during login. Please try again.", "error");
+                });
+        }
+
+        function logout() {
+            sessionStorage.removeItem("adminLoggedIn");
+            sessionStorage.removeItem("adminUsername");
+            showLoginForm();
+            // Clear input fields on logout
+            usernameInput.value = "";
+            passwordInput.value = "";
+            showLoginMessage("Logged out successfully", "success"); // Optional: show logout message
+        }
+
+        function showLoginMessage(message, type) {
+            loginMessage.textContent = message;
+            loginMessage.className = `login-message ${type}`;
+
+            setTimeout(() => {
+                loginMessage.textContent = "";
+                loginMessage.className = "login-message";
+            }, 3000);
+        }
+
+
+        // --- Section Navigation ---
+        function showSection(sectionName) {
+            // Hide all sections first
+            recordsSection.style.display = "none";
+            lotStatusSection.style.display = "none";
+            contactSubmissionsSection.style.display = "none"; // New: Hide contact submissions section
+
+            // Show the selected section and fetch data
+            if (sectionName === "records") {
+                recordsSection.style.display = "block";
+                fetchRecords();
+            } else if (sectionName === "lotStatus") {
+                lotStatusSection.style.display = "block";
+                fetchLotStatus();
+            } else if (sectionName === "contactSubmissions") { // New: Handle contact submissions section
+                 contactSubmissionsSection.style.display = "block";
+                 fetchContactSubmissions();
+            }
+
+
+            // Update active navigation link
+            document.querySelectorAll(".sidebar a.nav-link").forEach((link) => {
+                link.classList.remove("active");
+            });
+            const activeLink = document.querySelector(`.sidebar a.nav-link[data-section="${sectionName}"]`);
+            if (activeLink) {
+                activeLink.classList.add("active");
+            }
+        }
+
+
+        // --- Records Section Functions ---
+        function fetchRecords() {
+            // Add include[]=id to ensure the 'id' column is fetched
+            fetch(`${API_URL}?sheet=${RECORDS_SHEET}&include[]=${ID_COLUMN_NAME}`)
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then((data) => displayRecords(data))
+                .catch(() => showRecordMessage("Error loading records.", "error"));
+        }
+
+        function displayRecords(data) {
+            recordsTableBody.innerHTML = "";
+            if (!data || data.length === 0) {
+                recordsTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No records found.</td></tr>';
+                return;
+            }
+            data.forEach((record) => {
+                const row = document.createElement("tr");
+                // Store both id (for API calls) and original Name (for confirmation message)
+                row.dataset.id = record[ID_COLUMN_NAME]; // Store the unique ID using the configured column name
+                row.dataset.name = encodeURIComponent(record.Name || ''); // Store encoded name
+                row.innerHTML = `
+                    <td>${record.Name || ''}</td>
+                    <td>${record.Block || ''}</td>
+                    <td>${record.Lot || ''}</td>
+                    <td>${record["Date of Birth"] || ''}</td>
+                    <td>${record["Date of Death"] || ''}</td>
+                    <td class="edit-cell"><button class="edit-button" onclick="openEditForm(this)">✏️</button></td>`;
+                recordsTableBody.appendChild(row);
+            });
+        }
+
+        function filterRecordsTable() {
+            const nameFilter = document.getElementById("searchName").value.toLowerCase();
+            const blockFilter = document.getElementById("searchBlock").value.toLowerCase();
+            const lotFilter = document.getElementById("searchLot").value.toLowerCase();
+
+            document.querySelectorAll("#recordsTable tbody tr").forEach((row) => {
+                // Handle case where row might be the "No records found" message
+                if (row.querySelectorAll('td').length < 6) {
+                    row.style.display = "none"; // Hide info row during filtering
+                    return;
+                }
+
+                const name = row.children[0].textContent.toLowerCase(); // Adjusted index
+                const block = row.children[1].textContent.toLowerCase(); // Adjusted index
+                const lot = row.children[2].textContent.toLowerCase(); // Adjusted index
+
+                const matchesName = name.includes(nameFilter);
+                const matchesBlock = block.includes(blockFilter);
+                const matchesLot = lot.includes(lotFilter);
+
+                row.style.display =
+                    matchesName && matchesBlock && matchesLot ? "" : "none";
+            });
+        }
+
+        function handleSort(event) {
+            const target = event.target.closest('th');
+            if (!target) return;
+
+            const columnIndex = Array.from(target.parentNode.children).indexOf(target);
+            // Exclude the last column (Edit button) from sorting
+            if (target.classList.contains('edit-cell')) return;
+
+            const isAsc = currentSortColumn !== columnIndex || currentSortDirection === 'desc';
+            currentSortDirection = isAsc ? 'asc' : 'desc';
+            currentSortColumn = columnIndex;
+
+            const table = document.getElementById("recordsTable");
+            const tbody = table.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+
+            // Filter out the "No records found" row if it exists
+            const dataRows = rows.filter(row => row.querySelectorAll('td').length >= 6);
+
+            dataRows.sort((a, b) => {
+                const aText = a.children[columnIndex].textContent.trim().toLowerCase();
+                const bText = b.children[columnIndex].textContent.trim().toLowerCase();
+
+                if (aText < bText) return isAsc ? -1 : 1;
+                if (aText > bText) return isAsc ? 1 : -1;
+                return 0;
+            });
+
+            // Clear current table body
+            tbody.innerHTML = '';
+            // Append sorted rows
+            dataRows.forEach((row) => tbody.appendChild(row));
+            // If "No records found" row existed, add it back (though it should be hidden by filters)
+            rows.filter(row => row.querySelectorAll('td').length < 6).forEach(row => tbody.appendChild(row));
+
+
+            // Update arrow indicators
+            document.querySelectorAll("#recordsTable th .sort-arrow").forEach(arrow => {
+                arrow.textContent = "▼"; // Reset all
+            });
+            const currentArrow = target.querySelector('.sort-arrow');
+            if (currentArrow) {
+                currentArrow.textContent = isAsc ? "▲" : "▼";
+            }
+        }
+
+
+        function openAddForm() {
+            addFormModal.style.display = "flex";
+            // Clear previous values
+            addNameInput.value = "";
+            addBlockInput.value = "";
+            addLotInput.value = "";
+            addDOBInput.value = "";
+            addDODInput.value = "";
+            // Clear any previous message
+            showRecordMessage('', '');
+        }
+
+        function closeAddForm() {
+            addFormModal.style.display = "none";
+        }
+
+        function submitNewRecord() {
+            const newRecord = {
+                Name: addNameInput.value.trim(),
+                Block: addBlockInput.value.trim(),
+                Lot: addLotInput.value.trim(),
+                "Date of Birth": addDOBInput.value,
+                "Date of Death": addDODInput.value,
+                // No 'id' is sent here, SheetDB will create it
+            };
+
+            // Basic validation
+            if (!newRecord.Name || !newRecord.Block || !newRecord.Lot) {
+                showRecordMessage("Name, Block, and Lot are required.", "error");
+                return;
+            }
+
+
+            fetch(`${API_URL}?sheet=${RECORDS_SHEET}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    data: newRecord
+                }),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        // Handle API errors, e.g., invalid data, rate limits
+                        return response.json().then(err => { throw new Error(err.message || 'Failed to add record') });
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    closeAddForm();
+                    fetchRecords(); // Refresh table
+                    showRecordMessage("Record added successfully.", "success");
+                })
+                .catch((error) => {
+                    console.error("Error adding record:", error);
+                    showRecordMessage(`Error adding record: ${error.message || 'Please try again.'}`, "error");
+                });
+        }
+
+        function openEditForm(button) {
+            const row = button.closest("tr");
+            const cells = row.querySelectorAll("td");
+
+            // Get the unique ID from the data attribute
+            const recordId = row.dataset.id;
+            // Get the original name for confirmation message (optional, but helpful)
+            const originalName = decodeURIComponent(row.dataset.name || '');
+
+
+            if (!recordId) {
+                console.error("Record ID not found for editing.");
+                showRecordMessage("Cannot edit record: Unique ID missing.", "error");
+                return;
+            }
+
+            // Store the unique ID in the hidden input
+            editRecordIdInput.value = recordId;
+
+            // Populate form with current data (adjusting indices)
+            editNameInput.value = cells[0].textContent;
+            editBlockInput.value = cells[1].textContent;
+            editLotInput.value = cells[2].textContent;
+            editDOBInput.value = formatDateForInput(cells[3].textContent); // Format date for input[type="date"]
+            editDODInput.value = formatDateForInput(cells[4].textContent); // Format date for input[type="date"]
+
+            editFormModal.style.display = "flex";
+            // Clear any previous message
+            showRecordMessage('', '');
+        }
+
+        function formatDateForInput(dateStr) {
+            if (!dateStr) return "";
+            try {
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) {
+                    return "";
+                }
+
+                const year = date.getFullYear();
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+
+                return `${year}-${month}-${day}`;
+            } catch (e) {
+                console.error("Error formatting date:", dateStr, e);
+                return "";
+            }
+        }
+
+
+        function closeEditForm() {
+            editFormModal.style.display = "none";
+        }
+
+        function submitEdit() {
+            const recordId = editRecordIdInput.value; // Get the unique ID
+            const updatedRecord = {
+                Name: editNameInput.value.trim(),
+                Block: editBlockInput.value.trim(),
+                Lot: editLotInput.value.trim(),
+                "Date of Birth": editDOBInput.value,
+                "Date of Death": editDODInput.value,
+                // Do NOT include the 'id' in the update payload
+            };
+
+            // Basic validation
+            if (!updatedRecord.Name || !updatedRecord.Block || !updatedRecord.Lot) {
+                showRecordMessage("Name, Block, and Lot are required.", "error");
+                return;
+            }
+
+            if (!recordId) {
+                console.error("Record ID missing for update.");
+                showRecordMessage("Error: Unique ID missing for update.", "error");
+                return;
+            }
+
+
+            // Use the unique ID in the PUT request URL
+            fetch(`${API_URL}/${ID_COLUMN_NAME}/${recordId}?sheet=${RECORDS_SHEET}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    data: updatedRecord
+                }),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        // Handle API errors
+                        return response.json().then(err => { throw new Error(err.message || 'Failed to update record') });
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    closeEditForm();
+                    fetchRecords(); // Refresh table
+                    showRecordMessage("Record updated successfully.", "success");
+                })
+                .catch((error) => {
+                    console.error("Error updating record:", error);
+                    showRecordMessage(`Error updating record: ${error.message || 'Please try again.'}`, "error");
+                });
+        }
+
+        function deleteRecord() {
+            const recordId = editRecordIdInput.value; // Get the unique ID
+            const nameToDelete = editNameInput.value.trim(); // Get the name from the form for confirmation
+            const blockToDelete = editBlockInput.value.trim();
+            const lotToDelete = editLotInput.value.trim();
+
+            if (!recordId) {
+                console.error("Record ID missing for deletion.");
+                showRecordMessage("Error: Unique ID missing for deletion.", "error");
+                return;
+            }
+
+
+            if (!confirm(`Are you sure you want to delete the record for "${nameToDelete}" at Block ${blockToDelete}, Lot ${lotToDelete} (ID: ${recordId})?`)) {
+                return; // User cancelled
+            }
+
+            // Use the unique ID in the DELETE request URL
+            fetch(`${API_URL}/${ID_COLUMN_NAME}/${recordId}?sheet=${RECORDS_SHEET}`, {
+                method: "DELETE",
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        // Handle API errors
+                        return response.json().then(err => { throw new Error(err.message || 'Failed to delete record') });
+                    }
+                    // SheetDB DELETE returns the deleted row data on success
+                    return response.json();
+                })
+                .then(() => {
+                    closeEditForm();
+                    fetchRecords(); // Refresh table
+                    showRecordMessage("Record deleted successfully.", "success");
+                })
+                .catch((error) => {
+                    console.error("Error deleting record:", error);
+                    showRecordMessage(`Error deleting record: ${error.message || 'Please try again.'}`, "error");
+                });
+        }
+
+
+        function showRecordMessage(text, type) {
+            recordMessage.textContent = text;
+            recordMessage.className = `message ${type}`;
+            // Only set timeout to hide if there's text
+            if (text) {
+                setTimeout(() => {
+                    recordMessage.textContent = "";
+                    recordMessage.className = "message";
+                }, 5000); // Increased timeout for messages
+            } else {
+                recordMessage.style.display = 'none'; // Hide if text is empty
+            }
+            recordMessage.style.display = ''; // Ensure it's visible when showing a message
+        }
+
+
+        // --- Lot Status Section Functions ---
+        function fetchLotStatus() {
+            fetch(`${API_URL}?sheet=${LOT_STATUS_SHEET}`)
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then((data) => displayLotStatus(data))
+                .catch(() => showRecordMessage("Error loading lot status.", "error"));
+        }
+
+        function displayLotStatus(data) {
+            lotStatusTableBody.innerHTML = "";
+            if (!data || data.length === 0) {
+                lotStatusTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No lot status data found.</td></tr>';
+                return;
+            }
+            data.forEach((item) => {
+                const row = document.createElement("tr");
+                const statusClass = item.Status && item.Status.toLowerCase() === "occupied" ? "status-occupied" : "status-available";
+                row.innerHTML = `
+                    <td>${item.Block || ''}</td>
+                    <td>${item.Lot || ''}</td>
+                    <td class="status-cell ${statusClass}">${item.Status || ''}</td>
+                    <td>${item.Latitude || ''}</td>
+                    <td>${item.Longitude || ''}</td>
+                `;
+                lotStatusTableBody.appendChild(row);
+            });
+        }
+
+        function filterLotStatusTable() {
+            const blockFilter = document.getElementById("searchBlockLS").value.toLowerCase();
+            const lotFilter = document.getElementById("searchLotLS").value.toLowerCase();
+            const statusFilter = document.getElementById("searchStatusLS").value.toLowerCase();
+
+            document.querySelectorAll("#lotStatusTable tbody tr").forEach((row) => {
+                // Handle case where row might be the "No data found" message
+                if (row.querySelectorAll('td').length < 5) {
+                    row.style.display = "none"; // Hide info row during filtering
+                    return;
+                }
+
+                const block = row.children[0].textContent.toLowerCase();
+                const lot = row.children[1].textContent.toLowerCase();
+                const status = row.children[2].textContent.toLowerCase();
+
+                const matchesBlock = block.includes(blockFilter);
+                const matchesLot = lot.includes(lotFilter);
+                const matchesStatus = status.includes(statusFilter);
+
+                row.style.display =
+                    matchesBlock && matchesLot && matchesStatus ? "" : "none";
+            });
+        }
+
+        // --- New: Contact Submissions Section Functions ---
+        function fetchContactSubmissions() {
+            fetch(`${API_URL}?sheet=${CONTACT_SHEET}`)
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then((data) => displayContactSubmissions(data))
+                .catch(() => showRecordMessage("Error loading contact submissions.", "error")); // Using the same message display for now
+        }
+
+        function displayContactSubmissions(data) {
+            contactSubmissionsTableBody.innerHTML = "";
+            if (!data || data.length === 0) {
+                contactSubmissionsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No contact submissions found.</td></tr>';
+                return;
+            }
+            data.forEach((item) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.Timestamp || ''}</td>
+                    <td>${item.Name || ''}</td>
+                    <td>${item.Email || ''}</td>
+                    <td>${item.Subject || ''}</td>
+                    <td>${item.Message || ''}</td>
+                `;
+                contactSubmissionsTableBody.appendChild(row);
+            });
+        }
+
+        function filterContactSubmissionsTable() {
+            const timestampFilter = document.getElementById("searchTimestampCS").value.toLowerCase();
+            const nameFilter = document.getElementById("searchNameCS").value.toLowerCase();
+            const emailFilter = document.getElementById("searchEmailCS").value.toLowerCase();
+            const subjectFilter = document.getElementById("searchSubjectCS").value.toLowerCase();
+            // Message filter is not implemented as per table structure comment
+
+            document.querySelectorAll("#contactSubmissionsTable tbody tr").forEach((row) => {
+                 // Handle case where row might be the "No data found" message
+                if (row.querySelectorAll('td').length < 5) {
+                    row.style.display = "none"; // Hide info row during filtering
+                    return;
+                }
+
+                const timestamp = row.children[0].textContent.toLowerCase();
+                const name = row.children[1].textContent.toLowerCase();
+                const email = row.children[2].textContent.toLowerCase();
+                const subject = row.children[3].textContent.toLowerCase();
+                // const message = row.children[4].textContent.toLowerCase(); // Not used for filtering
+
+
+                const matchesTimestamp = timestamp.includes(timestampFilter);
+                const matchesName = name.includes(nameFilter);
+                const matchesEmail = email.includes(emailFilter);
+                const matchesSubject = subject.includes(subjectFilter);
+                // const matchesMessage = message.includes(messageFilter); // Not used for filtering
+
+
+                row.style.display =
+                    matchesTimestamp && matchesName && matchesEmail && matchesSubject ? "" : "none";
+            });
+        }
+
+    </script>
 </body>
-
 </html>
