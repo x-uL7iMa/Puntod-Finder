@@ -146,8 +146,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* REMOVED: background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-             /* The body background will now show behind the login form */
+            /* The body background will now show behind the login form */
         }
 
         .dashboard {
@@ -226,6 +225,7 @@
             flex: 1;
             padding: 2rem;
             margin-left: 220px;
+            overflow-x: auto; /* Allow horizontal scroll if table is too wide */
         }
 
         h1 {
@@ -294,7 +294,7 @@
             max-width: 100%;
             border-collapse: collapse;
             background: white;
-            table-layout: fixed;
+            table-layout: auto; /* Changed to auto for better column sizing */
             margin-top: 1rem;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             color: #333;
@@ -307,16 +307,18 @@
             border: 1px solid #ddd;
             text-align: left;
             word-wrap: break-word;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            /* Removed overflow and text-overflow to let content wrap */
         }
 
         th {
             background: #2c3e50;
             color: white;
-            position: relative;
-            padding-right: 1.5rem;
+            position: sticky; /* Make header sticky */
+            top: 0; /* Stick to the top */
+            z-index: 10; /* Ensure header is above table content */
+            padding-right: 1.5rem; /* Keep padding for sort arrow */
             cursor: pointer;
+            white-space: nowrap; /* Prevent header text wrapping */
         }
 
         th .sort-arrow {
@@ -349,7 +351,8 @@
 
         .edit-cell {
             text-align: center;
-            width: 60px;
+            width: 60px; /* Keep width for the button */
+            white-space: nowrap; /* Prevent button wrapping */
         }
 
         .edit-button {
@@ -384,18 +387,21 @@
             font-weight: bold;
             border-radius: 4px;
             transition: opacity 0.5s ease;
+            display: none; /* Hide initially */
         }
 
         .message.success {
             color: #155724;
             background-color: #d4edda;
             border: 1px solid #c3e6cb;
+            display: block; /* Show when class is added */
         }
 
         .message.error {
             color: #721c24;
             background-color: #f8d7da;
             border: 1px solid #f5c6cb;
+            display: block; /* Show when class is added */
         }
 
         /* --- Modals (Add/Edit Forms) --- */
@@ -496,6 +502,7 @@
             padding: 0.4rem;
             border-radius: 4px;
             color: white;
+            white-space: nowrap; /* Prevent status text wrapping */
         }
 
         .status-occupied {
@@ -506,9 +513,53 @@
             background-color: #27ae60;
         }
 
-        /* --- Admin Login Styles --- */
+        /* --- Contact Submission Status Styles (NEW) --- */
+        .contact-status-cell {
+            padding: 0.4rem !important; /* Adjust padding */
+            vertical-align: middle;
+            min-width: 150px; /* Give dropdown some minimum space */
+        }
 
-        /* Login Container already modified for flex layout */
+        .status-select {
+            padding: 5px 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Optional: Removes default dropdown arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-position: right 10px center;
+            background-repeat: no-repeat;
+            background-size: 10px;
+            padding-right: 30px; /* Make space for custom arrow if needed */
+            width: 100%; /* Make dropdown fill cell */
+            box-sizing: border-box; /* Include padding/border in width */
+        }
+
+        .status-new {
+            background-color: #d3d3d3; /* Light Gray */
+            color: #333;
+        }
+        .status-in-review {
+            background-color: #fff3cd; /* Yellow */
+            color: #856404;
+        }
+        .status-follow-up-needed {
+            background-color: #f8d7da; /* Red/Pink */
+            color: #721c24;
+        }
+        .status-resolved {
+            background-color: #d4edda; /* Green */
+            color: #155724;
+        }
+        .status-spam-ignored {
+            background-color: #e2e3e5; /* Gray */
+            color: #383d41;
+        }
+
+
+        /* --- Admin Login Styles --- */
 
         /* Login Form */
         .login-form {
@@ -595,18 +646,21 @@
             padding: 10px;
             border-radius: 5px;
             font-size: 14px;
+            display: none; /* Hide initially */
         }
 
         .login-message.error {
             background-color: #ffe6e6;
             color: #d63031;
             border: 1px solid #ffb8b8;
+            display: block; /* Show when class added */
         }
 
         .login-message.success {
             background-color: #e6ffee;
             color: #00b894;
             border: 1px solid #b8ffdd;
+            display: block; /* Show when class added */
         }
 
         /* --- Responsive adjustments --- */
@@ -756,6 +810,14 @@
                 /* Remove margin when sidebar is static */
                 padding-top: 1rem;
             }
+
+             /* Make table scrollable horizontally on small screens */
+            .main-content {
+                overflow-x: auto;
+            }
+            table {
+                min-width: 600px; /* Ensure table has min width for scrolling */
+            }
         }
     </style>
 </head>
@@ -805,6 +867,8 @@
         </div>
 
         <div class="main-content">
+            <div id="message" class="message"></div>
+
             <div class="lotStatus-section">
                 <div class="section-header">
                     <h1 class="section-title">Lot Status</h1>
@@ -854,12 +918,10 @@
                             <th>Lot <span class="sort-arrow" data-column="2">▼</span></th>
                             <th>Date of Birth</th>
                             <th>Date of Death</th>
-                            <th class="edit-cell"></th>
-                        </tr>
+                            <th class="edit-cell"></th> </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
-                <div id="message" class="message"></div>
             </div>
 
             <div class="contactSubmissions-section">
@@ -884,16 +946,14 @@
                             <th>Email</th>
                             <th>Subject</th>
                             <th>Message</th>
-                        </tr>
+                            <th>Status</th> </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
 
 
-        </div>
-
-        <div class="modal" id="addForm">
+        </div> <div class="modal" id="addForm">
             <div class="modal-content">
                 <h3>Add New Record</h3>
                 <label for="addName">Name</label>
@@ -939,20 +999,17 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <script>
+    </div> <script>
         // --- Configuration ---
         const API_URL = "https://sheetdb.io/api/v1/ao4bw50h75c36";
-        const RECORDS_SHEET = "TombRecords"; // Assuming 'Records' is the default sheet
-        const LOT_STATUS_SHEET = "LotStatus"; // Assuming 'LotStatus' is the sheet name
-        const ACCOUNTS_SHEET = "Accounts"; // Assuming 'Accounts' is the sheet name
-        const CONTACT_SHEET = "Contact"; // New: Sheet name for contact submissions
-        const ID_COLUMN_NAME = "id"; // The name of your unique ID column in the SheetDB API
-
+        const RECORDS_SHEET = "TombRecords";
+        const LOT_STATUS_SHEET = "LotStatus";
+        const ACCOUNTS_SHEET = "Accounts";
+        const CONTACT_SHEET = "Contact"; // Sheet name for contact submissions
+        const ID_COLUMN_NAME = "id"; // The name of your unique ID column in the SheetDB API (for TombRecords)
 
         // --- DOM Elements ---
-        const loginHeader = document.getElementById("loginHeader"); // Added header element
+        const loginHeader = document.getElementById("loginHeader");
         const loginContainer = document.getElementById("loginContainer");
         const dashboard = document.getElementById("dashboard");
         const loginMessage = document.getElementById("loginMessage");
@@ -962,13 +1019,13 @@
 
         const recordsSection = document.querySelector(".records-section");
         const lotStatusSection = document.querySelector(".lotStatus-section");
-        const contactSubmissionsSection = document.querySelector(".contactSubmissions-section"); // New: Contact Submissions section element
+        const contactSubmissionsSection = document.querySelector(".contactSubmissions-section");
 
         const recordsTableBody = document.querySelector("#recordsTable tbody");
         const lotStatusTableBody = document.querySelector("#lotStatusTable tbody");
-        const contactSubmissionsTableBody = document.querySelector("#contactSubmissionsTable tbody"); // New: Contact Submissions table body
+        const contactSubmissionsTableBody = document.querySelector("#contactSubmissionsTable tbody");
 
-        const recordMessage = document.getElementById("message"); // Used for all section messages for now
+        const globalMessageDiv = document.getElementById("message"); // Shared message display
 
         const addFormModal = document.getElementById("addForm");
         const addNameInput = document.getElementById("addName");
@@ -978,13 +1035,12 @@
         const addDODInput = document.getElementById("addDOD");
 
         const editFormModal = document.getElementById("editForm");
-        const editRecordIdInput = document.getElementById("editRecordId"); // Renamed from editIdentifier
+        const editRecordIdInput = document.getElementById("editRecordId");
         const editNameInput = document.getElementById("editName");
         const editBlockInput = document.getElementById("editBlock");
         const editLotInput = document.getElementById("editLot");
         const editDOBInput = document.getElementById("editDOB");
         const editDODInput = document.getElementById("editDOD");
-
 
         // --- State Variables ---
         let currentSortColumn = null;
@@ -994,53 +1050,45 @@
         document.addEventListener("DOMContentLoaded", function() {
             checkLoginStatus();
             setupEventListeners();
-            // Add login-view class to body on load if login form is initially visible
             if (loginContainer.style.display !== 'none') {
-                loginHeader.style.display = 'flex'; // Ensure header is shown on login view
+                loginHeader.style.display = 'flex';
             } else {
-                 loginHeader.style.display = 'none'; // Ensure header is hidden on dashboard view
+                 loginHeader.style.display = 'none';
             }
         });
 
         function setupEventListeners() {
-            // Login button click
             loginButton.addEventListener("click", attemptLogin);
+            passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") attemptLogin(); });
 
-            // Login on Enter key press in password field
-            passwordInput.addEventListener("keypress", function(e) {
-                if (e.key === "Enter") {
-                    attemptLogin();
-                }
-            });
-
-            // Setup search filters for Records
+            // Records Filters
             document.getElementById("searchName").addEventListener("input", filterRecordsTable);
             document.getElementById("searchBlock").addEventListener("input", filterRecordsTable);
             document.getElementById("searchLot").addEventListener("input", filterRecordsTable);
 
-            // Setup search filters for Lot Status
+            // Lot Status Filters
             document.getElementById("searchBlockLS").addEventListener("input", filterLotStatusTable);
             document.getElementById("searchLotLS").addEventListener("input", filterLotStatusTable);
             document.getElementById("searchStatusLS").addEventListener("input", filterLotStatusTable);
 
-            // New: Setup search filters for Contact Submissions
+            // Contact Submissions Filters
             document.getElementById("searchTimestampCS").addEventListener("input", filterContactSubmissionsTable);
             document.getElementById("searchNameCS").addEventListener("input", filterContactSubmissionsTable);
             document.getElementById("searchEmailCS").addEventListener("input", filterContactSubmissionsTable);
             document.getElementById("searchSubjectCS").addEventListener("input", filterContactSubmissionsTable);
+            // Add listener for status filter if input exists:
+            // const statusFilterInputCS = document.getElementById("searchStatusCS");
+            // if (statusFilterInputCS) statusFilterInputCS.addEventListener("input", filterContactSubmissionsTable);
 
-
-            // Setup sort arrows for Records
+            // Records Table Sorting
             document.querySelectorAll("#recordsTable th .sort-arrow").forEach((arrow) => {
                 arrow.addEventListener("click", handleSort);
             });
-
         }
 
         // --- Authentication Functions ---
         function checkLoginStatus() {
-            const isLoggedIn = sessionStorage.getItem("adminLoggedIn");
-            if (isLoggedIn === "true") {
+            if (sessionStorage.getItem("adminLoggedIn") === "true") {
                 showDashboard();
             } else {
                 showLoginForm();
@@ -1048,19 +1096,18 @@
         }
 
         function showLoginForm() {
-            loginHeader.style.display = 'flex'; // Show the header
+            loginHeader.style.display = 'flex';
             loginContainer.style.display = "flex";
             dashboard.style.display = "none";
-             // No need for login-view class if background is on body
+            loginMessage.style.display = 'none'; // Hide message on show
         }
 
         function showDashboard() {
-            loginHeader.style.display = 'none'; // Hide the header
+            loginHeader.style.display = 'none';
             loginContainer.style.display = "none";
             dashboard.style.display = "flex";
-             // Dashboard CSS handles its own background and text color
-            // Default to showing the records section on dashboard load
-            showSection('records');
+            showSection('records'); // Default to records section
+            globalMessageDiv.style.display = 'none'; // Hide message on show
         }
 
         function attemptLogin() {
@@ -1068,40 +1115,29 @@
             const password = passwordInput.value.trim();
 
             if (!username || !password) {
-                showLoginMessage("Please enter both username and password", "error");
+                showLoginMessage("Please enter both username and password.", "error");
                 return;
             }
 
             fetch(`${API_URL}?sheet=${ACCOUNTS_SHEET}`)
                 .then(res => {
-                    if (!res.ok) {
-                        // If the sheet doesn't exist or API key is wrong, this will catch it
-                        console.error("Failed to fetch accounts:", res.status, res.statusText);
-                        throw new Error(`Login failed: Could not reach authentication server.`);
-                    }
+                    if (!res.ok) throw new Error(`Login failed: Server error (${res.status})`);
                     return res.json();
                 })
                 .then(accounts => {
-                    // Ensure accounts is an array before searching
-                    if (!Array.isArray(accounts)) {
-                        console.error("Accounts data is not an array:", accounts);
-                        throw new Error("Login failed: Invalid accounts data received.");
-                    }
-                    const validAccount = accounts.find(acc =>
-                        acc.Username === username && acc.Password === password
-                    );
-
+                    if (!Array.isArray(accounts)) throw new Error("Login failed: Invalid account data.");
+                    const validAccount = accounts.find(acc => acc.Username === username && acc.Password === password);
                     if (validAccount) {
                         sessionStorage.setItem("adminLoggedIn", "true");
-                        sessionStorage.setItem("adminUsername", username); // Optional: store username
+                        sessionStorage.setItem("adminUsername", username);
                         showDashboard();
                     } else {
-                        showLoginMessage("Invalid username or password", "error");
+                        showLoginMessage("Invalid username or password.", "error");
                     }
                 })
                 .catch(err => {
                     console.error("Login error:", err);
-                    showLoginMessage(err.message || "Error during login. Please try again.", "error");
+                    showLoginMessage(err.message || "Error during login.", "error");
                 });
         }
 
@@ -1109,79 +1145,90 @@
             sessionStorage.removeItem("adminLoggedIn");
             sessionStorage.removeItem("adminUsername");
             showLoginForm();
-            // Clear input fields on logout
             usernameInput.value = "";
             passwordInput.value = "";
-            showLoginMessage("Logged out successfully", "success"); // Optional: show logout message
+            // Optionally show a success message on the login form after redirect
+            // showLoginMessage("Logged out successfully.", "success"); // This might not be visible after redirect
         }
 
         function showLoginMessage(message, type) {
             loginMessage.textContent = message;
-            loginMessage.className = `login-message ${type}`;
-
+            loginMessage.className = `login-message ${type}`; // This also makes it visible via CSS
             setTimeout(() => {
-                loginMessage.textContent = "";
-                loginMessage.className = "login-message";
+                loginMessage.style.display = 'none'; // Hide after timeout
+                loginMessage.className = "login-message"; // Reset class
             }, 3000);
+        }
+
+        // --- General Message Function ---
+        function showGlobalMessage(text, type) {
+            globalMessageDiv.textContent = text;
+            globalMessageDiv.className = `message ${type}`; // Also makes it visible via CSS
+            if (text) {
+                setTimeout(() => {
+                    globalMessageDiv.style.display = 'none'; // Hide after timeout
+                    globalMessageDiv.className = "message"; // Reset class
+                }, 5000);
+            } else {
+                globalMessageDiv.style.display = 'none'; // Hide immediately if text is empty
+            }
         }
 
 
         // --- Section Navigation ---
         function showSection(sectionName) {
-            // Hide all sections first
-            recordsSection.style.display = "none";
-            lotStatusSection.style.display = "none";
-            contactSubmissionsSection.style.display = "none"; // New: Hide contact submissions section
+            // Hide all sections
+            [recordsSection, lotStatusSection, contactSubmissionsSection].forEach(sec => sec.style.display = "none");
 
             // Show the selected section and fetch data
-            if (sectionName === "records") {
-                recordsSection.style.display = "block";
-                fetchRecords();
-            } else if (sectionName === "lotStatus") {
-                lotStatusSection.style.display = "block";
-                fetchLotStatus();
-            } else if (sectionName === "contactSubmissions") { // New: Handle contact submissions section
-                 contactSubmissionsSection.style.display = "block";
-                 fetchContactSubmissions();
+            let sectionToShow;
+            switch (sectionName) {
+                case "records":
+                    sectionToShow = recordsSection;
+                    fetchRecords();
+                    break;
+                case "lotStatus":
+                    sectionToShow = lotStatusSection;
+                    fetchLotStatus();
+                    break;
+                case "contactSubmissions":
+                    sectionToShow = contactSubmissionsSection;
+                    fetchContactSubmissions();
+                    break;
+                default:
+                    console.error("Unknown section:", sectionName);
+                    return;
             }
-
+            sectionToShow.style.display = "block";
 
             // Update active navigation link
-            document.querySelectorAll(".sidebar a.nav-link").forEach((link) => {
-                link.classList.remove("active");
-            });
+            document.querySelectorAll(".sidebar a.nav-link[data-section]").forEach(link => link.classList.remove("active"));
             const activeLink = document.querySelector(`.sidebar a.nav-link[data-section="${sectionName}"]`);
-            if (activeLink) {
-                activeLink.classList.add("active");
-            }
+            if (activeLink) activeLink.classList.add("active");
+
+            // Clear any lingering messages when switching sections
+            showGlobalMessage('', '');
         }
 
 
         // --- Records Section Functions ---
         function fetchRecords() {
-            // Add include[]=id to ensure the 'id' column is fetched
-            fetch(`${API_URL}?sheet=${RECORDS_SHEET}&include[]=${ID_COLUMN_NAME}`)
-                .then((res) => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
-                    return res.json();
-                })
-                .then((data) => displayRecords(data))
-                .catch(() => showRecordMessage("Error loading records.", "error"));
+            fetch(`${API_URL}?sheet=${RECORDS_SHEET}&include[]=${ID_COLUMN_NAME}`) // Ensure ID is included
+                .then(res => { if (!res.ok) throw new Error(`HTTP error! ${res.status}`); return res.json(); })
+                .then(data => displayRecords(data))
+                .catch(err => { console.error("Fetch Records Error:", err); showGlobalMessage("Error loading records.", "error"); });
         }
 
         function displayRecords(data) {
             recordsTableBody.innerHTML = "";
-            if (!data || data.length === 0) {
-                recordsTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No records found.</td></tr>';
+            if (!Array.isArray(data) || data.length === 0) {
+                recordsTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No records found.</td></tr>`;
                 return;
             }
-            data.forEach((record) => {
+            data.forEach(record => {
                 const row = document.createElement("tr");
-                // Store both id (for API calls) and original Name (for confirmation message)
-                row.dataset.id = record[ID_COLUMN_NAME]; // Store the unique ID using the configured column name
-                row.dataset.name = encodeURIComponent(record.Name || ''); // Store encoded name
+                row.dataset.id = record[ID_COLUMN_NAME]; // Store unique ID
+                row.dataset.name = encodeURIComponent(record.Name || ''); // Store encoded name for confirmation messages
                 row.innerHTML = `
                     <td>${record.Name || ''}</td>
                     <td>${record.Block || ''}</td>
@@ -1191,333 +1238,182 @@
                     <td class="edit-cell"><button class="edit-button" onclick="openEditForm(this)">✏️</button></td>`;
                 recordsTableBody.appendChild(row);
             });
+            // Apply initial sort if needed or reset sort indicators
+            resetSortIndicators();
         }
 
         function filterRecordsTable() {
             const nameFilter = document.getElementById("searchName").value.toLowerCase();
             const blockFilter = document.getElementById("searchBlock").value.toLowerCase();
             const lotFilter = document.getElementById("searchLot").value.toLowerCase();
+            let rowsFound = 0;
 
-            document.querySelectorAll("#recordsTable tbody tr").forEach((row) => {
-                // Handle case where row might be the "No records found" message
-                if (row.querySelectorAll('td').length < 6) {
-                    row.style.display = "none"; // Hide info row during filtering
-                    return;
-                }
+            document.querySelectorAll("#recordsTable tbody tr").forEach(row => {
+                if (row.querySelectorAll('td').length < 6) { row.style.display = "none"; return; } // Skip info row
 
-                const name = row.children[0].textContent.toLowerCase(); // Adjusted index
-                const block = row.children[1].textContent.toLowerCase(); // Adjusted index
-                const lot = row.children[2].textContent.toLowerCase(); // Adjusted index
+                const name = row.children[0].textContent.toLowerCase();
+                const block = row.children[1].textContent.toLowerCase();
+                const lot = row.children[2].textContent.toLowerCase();
 
-                const matchesName = name.includes(nameFilter);
-                const matchesBlock = block.includes(blockFilter);
-                const matchesLot = lot.includes(lotFilter);
-
-                row.style.display =
-                    matchesName && matchesBlock && matchesLot ? "" : "none";
+                const show = name.includes(nameFilter) && block.includes(blockFilter) && lot.includes(lotFilter);
+                row.style.display = show ? "" : "none";
+                if (show) rowsFound++;
             });
+             // Optional: Show message if no rows match filter
+             // if (rowsFound === 0 && (nameFilter || blockFilter || lotFilter)) { ... }
         }
 
         function handleSort(event) {
             const target = event.target.closest('th');
-            if (!target) return;
+            if (!target || target.classList.contains('edit-cell')) return;
 
             const columnIndex = Array.from(target.parentNode.children).indexOf(target);
-            // Exclude the last column (Edit button) from sorting
-            if (target.classList.contains('edit-cell')) return;
-
             const isAsc = currentSortColumn !== columnIndex || currentSortDirection === 'desc';
             currentSortDirection = isAsc ? 'asc' : 'desc';
             currentSortColumn = columnIndex;
 
-            const table = document.getElementById("recordsTable");
-            const tbody = table.querySelector("tbody");
-            const rows = Array.from(tbody.querySelectorAll("tr"));
+            const tbody = document.getElementById("recordsTable").querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr")).filter(row => row.querySelectorAll('td').length >= 6); // Filter data rows
 
-            // Filter out the "No records found" row if it exists
-            const dataRows = rows.filter(row => row.querySelectorAll('td').length >= 6);
-
-            dataRows.sort((a, b) => {
+            rows.sort((a, b) => {
                 const aText = a.children[columnIndex].textContent.trim().toLowerCase();
                 const bText = b.children[columnIndex].textContent.trim().toLowerCase();
-
                 if (aText < bText) return isAsc ? -1 : 1;
                 if (aText > bText) return isAsc ? 1 : -1;
                 return 0;
             });
 
-            // Clear current table body
-            tbody.innerHTML = '';
-            // Append sorted rows
-            dataRows.forEach((row) => tbody.appendChild(row));
-            // If "No records found" row existed, add it back (though it should be hidden by filters)
-            rows.filter(row => row.querySelectorAll('td').length < 6).forEach(row => tbody.appendChild(row));
+            tbody.innerHTML = ''; // Clear existing rows
+            rows.forEach(row => tbody.appendChild(row)); // Append sorted rows
 
-
-            // Update arrow indicators
-            document.querySelectorAll("#recordsTable th .sort-arrow").forEach(arrow => {
-                arrow.textContent = "▼"; // Reset all
-            });
-            const currentArrow = target.querySelector('.sort-arrow');
-            if (currentArrow) {
-                currentArrow.textContent = isAsc ? "▲" : "▼";
-            }
+            updateSortIndicators(target, isAsc); // Update visual indicators
         }
+
+        function updateSortIndicators(activeHeader, isAsc) {
+             document.querySelectorAll("#recordsTable th .sort-arrow").forEach(arrow => arrow.textContent = "▼"); // Reset all
+             const currentArrow = activeHeader.querySelector('.sort-arrow');
+             if (currentArrow) currentArrow.textContent = isAsc ? "▲" : "▼";
+        }
+         function resetSortIndicators() {
+             document.querySelectorAll("#recordsTable th .sort-arrow").forEach(arrow => arrow.textContent = "▼");
+             currentSortColumn = null; // Reset sort state
+             currentSortDirection = 'asc';
+         }
 
 
         function openAddForm() {
             addFormModal.style.display = "flex";
-            // Clear previous values
-            addNameInput.value = "";
-            addBlockInput.value = "";
-            addLotInput.value = "";
-            addDOBInput.value = "";
-            addDODInput.value = "";
-            // Clear any previous message
-            showRecordMessage('', '');
+            addNameInput.value = ""; addBlockInput.value = ""; addLotInput.value = "";
+            addDOBInput.value = ""; addDODInput.value = "";
+            showGlobalMessage('', ''); // Clear message
         }
 
-        function closeAddForm() {
-            addFormModal.style.display = "none";
-        }
+        function closeAddForm() { addFormModal.style.display = "none"; }
 
         function submitNewRecord() {
             const newRecord = {
-                Name: addNameInput.value.trim(),
-                Block: addBlockInput.value.trim(),
-                Lot: addLotInput.value.trim(),
-                "Date of Birth": addDOBInput.value,
-                "Date of Death": addDODInput.value,
-                // No 'id' is sent here, SheetDB will create it
+                Name: addNameInput.value.trim(), Block: addBlockInput.value.trim(), Lot: addLotInput.value.trim(),
+                "Date of Birth": addDOBInput.value, "Date of Death": addDODInput.value,
             };
-
-            // Basic validation
             if (!newRecord.Name || !newRecord.Block || !newRecord.Lot) {
-                showRecordMessage("Name, Block, and Lot are required.", "error");
-                return;
+                showGlobalMessage("Name, Block, and Lot are required.", "error"); return;
             }
 
-
             fetch(`${API_URL}?sheet=${RECORDS_SHEET}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    data: newRecord
-                }),
+                method: "POST", headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ data: newRecord }),
             })
-                .then((response) => {
-                    if (!response.ok) {
-                        // Handle API errors, e.g., invalid data, rate limits
-                        return response.json().then(err => { throw new Error(err.message || 'Failed to add record') });
-                    }
-                    return response.json();
-                })
-                .then(() => {
-                    closeAddForm();
-                    fetchRecords(); // Refresh table
-                    showRecordMessage("Record added successfully.", "success");
-                })
-                .catch((error) => {
-                    console.error("Error adding record:", error);
-                    showRecordMessage(`Error adding record: ${error.message || 'Please try again.'}`, "error");
-                });
+            .then(res => { if (!res.ok) throw new Error('Failed to add record'); return res.json(); })
+            .then(() => { closeAddForm(); fetchRecords(); showGlobalMessage("Record added successfully.", "success"); })
+            .catch(err => { console.error("Add Record Error:", err); showGlobalMessage(`Error adding record: ${err.message}`, "error"); });
         }
 
         function openEditForm(button) {
             const row = button.closest("tr");
             const cells = row.querySelectorAll("td");
-
-            // Get the unique ID from the data attribute
             const recordId = row.dataset.id;
-            // Get the original name for confirmation message (optional, but helpful)
-            const originalName = decodeURIComponent(row.dataset.name || '');
 
+            if (!recordId) { showGlobalMessage("Cannot edit: Unique ID missing.", "error"); return; }
 
-            if (!recordId) {
-                console.error("Record ID not found for editing.");
-                showRecordMessage("Cannot edit record: Unique ID missing.", "error");
-                return;
-            }
-
-            // Store the unique ID in the hidden input
             editRecordIdInput.value = recordId;
-
-            // Populate form with current data (adjusting indices)
-            editNameInput.value = cells[0].textContent;
-            editBlockInput.value = cells[1].textContent;
-            editLotInput.value = cells[2].textContent;
-            editDOBInput.value = formatDateForInput(cells[3].textContent); // Format date for input[type="date"]
-            editDODInput.value = formatDateForInput(cells[4].textContent); // Format date for input[type="date"]
+            editNameInput.value = cells[0].textContent; editBlockInput.value = cells[1].textContent; editLotInput.value = cells[2].textContent;
+            editDOBInput.value = formatDateForInput(cells[3].textContent);
+            editDODInput.value = formatDateForInput(cells[4].textContent);
 
             editFormModal.style.display = "flex";
-            // Clear any previous message
-            showRecordMessage('', '');
+            showGlobalMessage('', ''); // Clear message
         }
 
         function formatDateForInput(dateStr) {
             if (!dateStr) return "";
             try {
                 const date = new Date(dateStr);
-                if (isNaN(date.getTime())) {
-                    return "";
-                }
-
+                if (isNaN(date.getTime())) return ""; // Invalid date string
                 const year = date.getFullYear();
                 const month = (date.getMonth() + 1).toString().padStart(2, '0');
                 const day = date.getDate().toString().padStart(2, '0');
-
                 return `${year}-${month}-${day}`;
-            } catch (e) {
-                console.error("Error formatting date:", dateStr, e);
-                return "";
-            }
+            } catch (e) { return ""; }
         }
 
-
-        function closeEditForm() {
-            editFormModal.style.display = "none";
-        }
+        function closeEditForm() { editFormModal.style.display = "none"; }
 
         function submitEdit() {
-            const recordId = editRecordIdInput.value; // Get the unique ID
+            const recordId = editRecordIdInput.value;
             const updatedRecord = {
-                Name: editNameInput.value.trim(),
-                Block: editBlockInput.value.trim(),
-                Lot: editLotInput.value.trim(),
-                "Date of Birth": editDOBInput.value,
-                "Date of Death": editDODInput.value,
-                // Do NOT include the 'id' in the update payload
+                Name: editNameInput.value.trim(), Block: editBlockInput.value.trim(), Lot: editLotInput.value.trim(),
+                "Date of Birth": editDOBInput.value, "Date of Death": editDODInput.value,
             };
-
-            // Basic validation
             if (!updatedRecord.Name || !updatedRecord.Block || !updatedRecord.Lot) {
-                showRecordMessage("Name, Block, and Lot are required.", "error");
-                return;
+                showGlobalMessage("Name, Block, and Lot are required.", "error"); return;
             }
+            if (!recordId) { showGlobalMessage("Error: Unique ID missing for update.", "error"); return; }
 
-            if (!recordId) {
-                console.error("Record ID missing for update.");
-                showRecordMessage("Error: Unique ID missing for update.", "error");
-                return;
-            }
-
-
-            // Use the unique ID in the PUT request URL
             fetch(`${API_URL}/${ID_COLUMN_NAME}/${recordId}?sheet=${RECORDS_SHEET}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    data: updatedRecord
-                }),
+                method: "PUT", headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ data: updatedRecord }),
             })
-                .then((response) => {
-                    if (!response.ok) {
-                        // Handle API errors
-                        return response.json().then(err => { throw new Error(err.message || 'Failed to update record') });
-                    }
-                    return response.json();
-                })
-                .then(() => {
-                    closeEditForm();
-                    fetchRecords(); // Refresh table
-                    showRecordMessage("Record updated successfully.", "success");
-                })
-                .catch((error) => {
-                    console.error("Error updating record:", error);
-                    showRecordMessage(`Error updating record: ${error.message || 'Please try again.'}`, "error");
-                });
+            .then(res => { if (!res.ok) throw new Error('Failed to update record'); return res.json(); })
+            .then(() => { closeEditForm(); fetchRecords(); showGlobalMessage("Record updated successfully.", "success"); })
+            .catch(err => { console.error("Update Record Error:", err); showGlobalMessage(`Error updating record: ${err.message}`, "error"); });
         }
 
         function deleteRecord() {
-            const recordId = editRecordIdInput.value; // Get the unique ID
-            const nameToDelete = editNameInput.value.trim(); // Get the name from the form for confirmation
-            const blockToDelete = editBlockInput.value.trim();
-            const lotToDelete = editLotInput.value.trim();
+            const recordId = editRecordIdInput.value;
+            const nameToDelete = editNameInput.value.trim(); // For confirmation message
+            if (!recordId) { showGlobalMessage("Error: Unique ID missing for deletion.", "error"); return; }
 
-            if (!recordId) {
-                console.error("Record ID missing for deletion.");
-                showRecordMessage("Error: Unique ID missing for deletion.", "error");
-                return;
-            }
+            if (!confirm(`Are you sure you want to delete the record for "${nameToDelete}" (ID: ${recordId})?`)) return;
 
-
-            if (!confirm(`Are you sure you want to delete the record for "${nameToDelete}" at Block ${blockToDelete}, Lot ${lotToDelete} (ID: ${recordId})?`)) {
-                return; // User cancelled
-            }
-
-            // Use the unique ID in the DELETE request URL
-            fetch(`${API_URL}/${ID_COLUMN_NAME}/${recordId}?sheet=${RECORDS_SHEET}`, {
-                method: "DELETE",
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        // Handle API errors
-                        return response.json().then(err => { throw new Error(err.message || 'Failed to delete record') });
-                    }
-                    // SheetDB DELETE returns the deleted row data on success
-                    return response.json();
-                })
-                .then(() => {
-                    closeEditForm();
-                    fetchRecords(); // Refresh table
-                    showRecordMessage("Record deleted successfully.", "success");
-                })
-                .catch((error) => {
-                    console.error("Error deleting record:", error);
-                    showRecordMessage(`Error deleting record: ${error.message || 'Please try again.'}`, "error");
-                });
-        }
-
-
-        function showRecordMessage(text, type) {
-            recordMessage.textContent = text;
-            recordMessage.className = `message ${type}`;
-            // Only set timeout to hide if there's text
-            if (text) {
-                setTimeout(() => {
-                    recordMessage.textContent = "";
-                    recordMessage.className = "message";
-                }, 5000); // Increased timeout for messages
-            } else {
-                recordMessage.style.display = 'none'; // Hide if text is empty
-            }
-            recordMessage.style.display = ''; // Ensure it's visible when showing a message
+            fetch(`${API_URL}/${ID_COLUMN_NAME}/${recordId}?sheet=${RECORDS_SHEET}`, { method: "DELETE" })
+            .then(res => { if (!res.ok) throw new Error('Failed to delete record'); return res.json(); })
+            .then(() => { closeEditForm(); fetchRecords(); showGlobalMessage("Record deleted successfully.", "success"); })
+            .catch(err => { console.error("Delete Record Error:", err); showGlobalMessage(`Error deleting record: ${err.message}`, "error"); });
         }
 
 
         // --- Lot Status Section Functions ---
         function fetchLotStatus() {
             fetch(`${API_URL}?sheet=${LOT_STATUS_SHEET}`)
-                .then((res) => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
-                    return res.json();
-                })
-                .then((data) => displayLotStatus(data))
-                .catch(() => showRecordMessage("Error loading lot status.", "error"));
+                .then(res => { if (!res.ok) throw new Error(`HTTP error! ${res.status}`); return res.json(); })
+                .then(data => displayLotStatus(data))
+                .catch(err => { console.error("Fetch Lot Status Error:", err); showGlobalMessage("Error loading lot status.", "error"); });
         }
 
         function displayLotStatus(data) {
             lotStatusTableBody.innerHTML = "";
-            if (!data || data.length === 0) {
-                lotStatusTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No lot status data found.</td></tr>';
+            if (!Array.isArray(data) || data.length === 0) {
+                lotStatusTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No lot status data found.</td></tr>`;
                 return;
             }
-            data.forEach((item) => {
+            data.forEach(item => {
                 const row = document.createElement("tr");
                 const statusClass = item.Status && item.Status.toLowerCase() === "occupied" ? "status-occupied" : "status-available";
                 row.innerHTML = `
                     <td>${item.Block || ''}</td>
                     <td>${item.Lot || ''}</td>
-                    <td class="status-cell ${statusClass}">${item.Status || ''}</td>
-                    <td>${item.Latitude || ''}</td>
-                    <td>${item.Longitude || ''}</td>
-                `;
+                    <td class="status-cell ${statusClass}">${item.Status || 'Available'}</td> <td>${item.Latitude || ''}</td>
+                    <td>${item.Longitude || ''}</td>`;
                 lotStatusTableBody.appendChild(row);
             });
         }
@@ -1527,47 +1423,51 @@
             const lotFilter = document.getElementById("searchLotLS").value.toLowerCase();
             const statusFilter = document.getElementById("searchStatusLS").value.toLowerCase();
 
-            document.querySelectorAll("#lotStatusTable tbody tr").forEach((row) => {
-                // Handle case where row might be the "No data found" message
-                if (row.querySelectorAll('td').length < 5) {
-                    row.style.display = "none"; // Hide info row during filtering
-                    return;
-                }
+            document.querySelectorAll("#lotStatusTable tbody tr").forEach(row => {
+                if (row.querySelectorAll('td').length < 5) { row.style.display = "none"; return; } // Skip info row
 
                 const block = row.children[0].textContent.toLowerCase();
                 const lot = row.children[1].textContent.toLowerCase();
                 const status = row.children[2].textContent.toLowerCase();
 
-                const matchesBlock = block.includes(blockFilter);
-                const matchesLot = lot.includes(lotFilter);
-                const matchesStatus = status.includes(statusFilter);
-
-                row.style.display =
-                    matchesBlock && matchesLot && matchesStatus ? "" : "none";
+                const show = block.includes(blockFilter) && lot.includes(lotFilter) && status.includes(statusFilter);
+                row.style.display = show ? "" : "none";
             });
         }
 
-        // --- New: Contact Submissions Section Functions ---
+        // --- Contact Submissions Section Functions (UPDATED) ---
         function fetchContactSubmissions() {
-            fetch(`${API_URL}?sheet=${CONTACT_SHEET}`)
-                .then((res) => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
-                    return res.json();
-                })
-                .then((data) => displayContactSubmissions(data))
-                .catch(() => showRecordMessage("Error loading contact submissions.", "error")); // Using the same message display for now
+            // Ensure 'Status' column exists in your Google Sheet named 'Contact'
+            fetch(`${API_URL}?sheet=${CONTACT_SHEET}`) // SheetDB usually fetches all columns
+                .then(res => { if (!res.ok) throw new Error(`HTTP error! ${res.status}`); return res.json(); })
+                .then(data => displayContactSubmissions(data))
+                .catch(err => { console.error("Fetch Contact Submissions Error:", err); showGlobalMessage("Error loading contact submissions.", "error"); });
         }
 
         function displayContactSubmissions(data) {
             contactSubmissionsTableBody.innerHTML = "";
-            if (!data || data.length === 0) {
-                contactSubmissionsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No contact submissions found.</td></tr>';
+            if (!Array.isArray(data) || data.length === 0) {
+                // Adjusted colspan for the new Status column
+                contactSubmissionsTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No contact submissions found.</td></tr>`;
                 return;
             }
-            data.forEach((item) => {
+
+            // Define status options and their corresponding CSS classes for coloring
+            const statusOptionsMap = {
+                "In Review": "status-in-review",
+                "Follow-Up Needed": "status-follow-up-needed",
+                "Resolved": "status-resolved",
+                "Spam / Ignored": "status-spam-ignored"
+            };
+
+            data.forEach((item, index) => {
                 const row = document.createElement("tr");
+                // Use Timestamp as the identifier. IMPORTANT: Assumes Timestamp is unique enough.
+                // If not, add a real unique ID column in your sheet and use item.id (or similar).
+                const identifier = item.Timestamp || `fallback-id-${index}`;
+                row.dataset.identifier = identifier;
+
+                // Populate basic cells first
                 row.innerHTML = `
                     <td>${item.Timestamp || ''}</td>
                     <td>${item.Name || ''}</td>
@@ -1575,40 +1475,160 @@
                     <td>${item.Subject || ''}</td>
                     <td>${item.Message || ''}</td>
                 `;
+
+                // --- Create and Configure Status Dropdown ---
+                const statusCell = document.createElement("td");
+                statusCell.classList.add("contact-status-cell");
+
+                const select = document.createElement("select");
+                select.classList.add("status-select");
+                select.id = `status-select-${identifier.replace(/[\s.:]/g, '-')}`; // Create a safe ID
+
+                const currentStatus = item.Status || 'New'; // Default to 'New' if empty/null
+
+                // 1. Add the 'New' state (if applicable)
+                if (currentStatus === 'New') {
+                    const newOption = document.createElement("option");
+                    newOption.value = "New";
+                    newOption.textContent = "New";
+                    newOption.disabled = true; // Make it non-selectable in the dropdown list
+                    newOption.selected = true; // Show it as the current value
+                    select.appendChild(newOption);
+                    select.classList.add("status-new"); // Apply initial color
+                }
+
+                // 2. Add the standard selectable options
+                for (const [text, className] of Object.entries(statusOptionsMap)) {
+                    const option = document.createElement("option");
+                    option.value = text;
+                    option.textContent = text;
+                    if (currentStatus === text) {
+                        option.selected = true;
+                        // Apply color class based on the selected status (overrides 'New' if applicable)
+                         select.className = `status-select ${className}`;
+                    }
+                    select.appendChild(option);
+                }
+
+                 // 3. Ensure correct initial color if status was already set (and not 'New')
+                 if (currentStatus !== 'New' && statusOptionsMap[currentStatus]) {
+                     select.className = `status-select ${statusOptionsMap[currentStatus]}`;
+                 } else if (currentStatus === 'New' && !select.classList.contains('status-new')) {
+                     // Double-check the 'new' class is present if status is 'New'
+                     select.classList.add('status-new');
+                 }
+
+
+                // 4. Add event listener to update sheet on change
+                select.addEventListener('change', (event) => updateContactStatus(event, identifier, statusOptionsMap));
+
+                statusCell.appendChild(select);
+                row.appendChild(statusCell); // Add the status cell to the row
+                // --- End Status Dropdown ---
+
                 contactSubmissionsTableBody.appendChild(row);
             });
         }
+
+        // --- NEW: Function to update Contact Submission status ---
+        function updateContactStatus(event, identifier, statusOptionsMap) {
+            const selectElement = event.target;
+            const newStatus = selectElement.value;
+
+            if (!identifier) {
+                console.error("Missing identifier for status update.");
+                showGlobalMessage("Could not update status: missing identifier.", "error");
+                return; // Stop if identifier is missing
+            }
+
+            // --- Visual Update (Immediate) ---
+            // Remove the disabled 'New' option if it exists and a real status is chosen
+            const newOption = selectElement.querySelector('option[value="New"]');
+            if (newOption && newStatus !== 'New') { // Check newStatus condition
+                 selectElement.removeChild(newOption);
+            }
+
+            // Update background color based on the new selection
+            const colorClass = statusOptionsMap[newStatus] || 'status-new'; // Fallback unlikely but safe
+            selectElement.className = `status-select ${colorClass}`; // Reset classes and apply the new one
+            // --- End Visual Update ---
+
+
+            console.log(`Attempting to update status for identifier '${identifier}' to '${newStatus}'`); // Debug log
+
+            // --- API Call to Update Google Sheet ---
+            // Using PATCH with Timestamp as the key. Ensure 'Timestamp' column header matches exactly.
+            // IMPORTANT: This relies on Timestamp being unique enough to target the correct row.
+            // If you have duplicates or issues, switch to a unique ID column.
+            fetch(`${API_URL}/Timestamp/${encodeURIComponent(identifier)}?sheet=${CONTACT_SHEET}`, {
+                method: "PATCH", // Use PATCH to update only specified fields
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    data: {
+                        Status: newStatus // Update only the Status column
+                    }
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Try to get error details from SheetDB response
+                    return response.json().then(err => {
+                        console.error("SheetDB Update Error Response:", err);
+                        throw new Error(err.error || err.message || `Update failed (HTTP ${response.status})`);
+                    }).catch(() => {
+                        // Fallback if error response is not JSON or parsing fails
+                        throw new Error(`Update failed (HTTP ${response.status})`);
+                    });
+                }
+                return response.json(); // Success
+            })
+            .then(result => {
+                console.log("Status update successful:", result);
+                showGlobalMessage(`Status updated to "${newStatus}".`, "success");
+                // Optional: Could re-fetch data, but immediate visual update is usually sufficient
+                // fetchContactSubmissions();
+            })
+            .catch(error => {
+                console.error("Error updating status via API:", error);
+                showGlobalMessage(`Error updating status: ${error.message}`, "error");
+                // Consider reverting the dropdown visually if the API call fails
+                // fetchContactSubmissions(); // Re-fetch to reset to original state from sheet
+            });
+        }
+
 
         function filterContactSubmissionsTable() {
             const timestampFilter = document.getElementById("searchTimestampCS").value.toLowerCase();
             const nameFilter = document.getElementById("searchNameCS").value.toLowerCase();
             const emailFilter = document.getElementById("searchEmailCS").value.toLowerCase();
             const subjectFilter = document.getElementById("searchSubjectCS").value.toLowerCase();
-            // Message filter is not implemented as per table structure comment
+            // Optional: Get status filter value if input exists
+            // const statusFilterInput = document.getElementById("searchStatusCS");
+            // const statusFilter = statusFilterInput ? statusFilterInput.value.toLowerCase() : "";
 
-            document.querySelectorAll("#contactSubmissionsTable tbody tr").forEach((row) => {
-                 // Handle case where row might be the "No data found" message
-                if (row.querySelectorAll('td').length < 5) {
-                    row.style.display = "none"; // Hide info row during filtering
-                    return;
-                }
+            document.querySelectorAll("#contactSubmissionsTable tbody tr").forEach(row => {
+                // Adjusted colspan check for the new Status column
+                if (row.querySelectorAll('td').length < 6) { row.style.display = "none"; return; } // Skip info row
 
                 const timestamp = row.children[0].textContent.toLowerCase();
                 const name = row.children[1].textContent.toLowerCase();
                 const email = row.children[2].textContent.toLowerCase();
                 const subject = row.children[3].textContent.toLowerCase();
-                // const message = row.children[4].textContent.toLowerCase(); // Not used for filtering
+                // Get status from the select element in the 6th column (index 5)
+                const statusSelect = row.children[5].querySelector('select');
+                const status = statusSelect ? statusSelect.value.toLowerCase() : '';
 
+                let show = timestamp.includes(timestampFilter) &&
+                           name.includes(nameFilter) &&
+                           email.includes(emailFilter) &&
+                           subject.includes(subjectFilter);
 
-                const matchesTimestamp = timestamp.includes(timestampFilter);
-                const matchesName = name.includes(nameFilter);
-                const matchesEmail = email.includes(emailFilter);
-                const matchesSubject = subject.includes(subjectFilter);
-                // const matchesMessage = message.includes(messageFilter); // Not used for filtering
+                // Optional: Add status filter logic
+                // if (statusFilter) {
+                //     show = show && status.includes(statusFilter);
+                // }
 
-
-                row.style.display =
-                    matchesTimestamp && matchesName && matchesEmail && matchesSubject ? "" : "none";
+                row.style.display = show ? "" : "none";
             });
         }
 
