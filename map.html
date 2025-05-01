@@ -5,11 +5,8 @@
     <title>Puntod Finder - San Pedro Bautista Memorial Park II</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- Leaflet Routing Machine CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-    <!-- Leaflet Point in Polygon Plugin -->
     <script src="https://unpkg.com/leaflet-pip@1.1.0/leaflet-pip.js"></script>
 
     <style>
@@ -204,7 +201,7 @@
       .leaflet-routing-container-hide {
         display: none;
       }
-      
+
       /* Fade transition effect */
       body {
         opacity: 0;
@@ -216,7 +213,7 @@
       body.fade-in {
         opacity: 1;
       }
-      
+
       /* Responsive adjustments */
       @media (max-width: 600px) {
         header {
@@ -229,7 +226,6 @@
     </style>
   </head>
   <body class="fade-out">
-    <!-- Header matching index.html -->
     <header>
       <a href="index.html" class="header-logo" style="text-decoration: none; color: white;">
         <img src="images/Puntod%20Finder%20Logo.png" alt="Puntod Finder Logo">
@@ -265,55 +261,61 @@
       <div class="user-status" id="user-status"></div>
     </div>
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- Leaflet Routing Machine JS -->
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
     <script>
-      // Fade in on page load
-      window.addEventListener('DOMContentLoaded', () => {
-        document.body.classList.add('fade-in');
-        document.body.classList.remove('fade-out');
-      });
+      // Utility functions for UI
+      const $ = (id) => document.getElementById(id);
+      const show = (el) => el.style.display = 'block';
+      const hide = (el) => el.style.display = 'none';
 
-      // Fade out on link click
-      document.querySelectorAll('a.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          const destination = this.href;
+      function showLoader() { show($('loader')); }
+      function hideLoader() { hide($('loader')); }
+
+      function showLocationError() {
+          show($('location-error'));
+          setTimeout(() => hide($('location-error')), 5000);
+      }
+
+      function updateUserStatus(isInside) {
+          const userStatusEl = $('user-status');
+          show(userStatusEl);
+          userStatusEl.innerHTML = isInside ? '✓ You are inside the cemetery' : 'ℹ️ You are outside the cemetery';
+          userStatusEl.className = 'user-status ' + (isInside ? 'inside-cemetery' : 'outside-cemetery');
+          isInside ? hide($('directions-container')) : show($('directions-container'));
+      }
+
+      function removeUserStatus() { hide($('user-status')); }
+
+      // Fade transitions
+      function fadeInBody() {
+          document.body.classList.add('fade-in');
+          document.body.classList.remove('fade-out');
+      }
+
+      function fadeOutBody(destination) {
           document.body.classList.remove('fade-in');
           document.body.classList.add('fade-out');
-          setTimeout(() => {
-            window.location.href = destination;
-          }, 500); // matches CSS transition
-        });
-      });
+          setTimeout(() => { window.location.href = destination; }, 500);
+      }
 
       // Initialize the map
-      var map = L.map("map").setView([13.9328, 121.4065], 18);
+      const map = L.map("map").setView([13.9328, 121.4065], 18);
 
       // Add OpenStreetMap tile layer
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors",
       }).addTo(map);
 
-      // Initialize variables for user location and routing
-      var userLocation = null;
-      var userMarker = null;
-      var routingControl = null;
-      var cemeteryLayer = null;
-      var isInsideCemetery = false;
-
-      // Function to show loader
-      function showLoader() {
-        document.getElementById('loader').style.display = 'block';
-      }
-
-      // Function to hide loader
-      function hideLoader() {
-        document.getElementById('loader').style.display = 'none';
-      }
+      // Initialize variables
+      let userLocation = null;
+      let userMarker = null;
+      let routingControl = null;
+      let cemeteryLayer = null;
+      let isInsideCemetery = false;
+      const blockLayers = {};
+      let currentHighlightedLayer = null;
 
       // Show loader before fetching data
       showLoader();
@@ -322,11 +324,6 @@
       let loadedDatasets = 0;
       const totalDatasets = 2;
 
-      // Store block layers for later reference
-      var blockLayers = {};
-      var currentHighlightedLayer = null;
-
-      // Function to check if all data is loaded
       function checkAllDataLoaded() {
         loadedDatasets++;
         if (loadedDatasets === totalDatasets) {
@@ -334,32 +331,96 @@
         }
       }
 
-      // Load the cemetery data first (so it's underneath)
-      fetch('map/cemetery.json')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
+      // Function to check if a point is inside the cemetery polygon
+      function checkIfInsideCemetery(latLng) {
+        if (!cemeteryLayer) return false;
+        const results = leafletPip.pointInLayer([latLng.lng, latLng.lat], cemeteryLayer, true);
+        isInsideCemetery = results && results.length > 0;
+        updateUserStatus(isInsideCemetery);
+        return isInsideCemetery;
+      }
+
+      // Function to handle highlighting and unhighlighting blocks
+      function setBlockHighlight(layer, isHighlighted) {
+          layer.setStyle({
+              color: isHighlighted ? "#FF4500" : "#228B22",
+              weight: isHighlighted ? 3 : 1,
+              fillColor: isHighlighted ? "#FFA500" : "#32CD32",
+              fillOpacity: isHighlighted ? 0.7 : 0.6,
+          });
+          if (isHighlighted) {
+              layer.bringToFront();
           }
-          return response.json();
-        })
+      }
+
+      // Function to highlight a selected block
+      function highlightBlock(blockName) {
+        if (currentHighlightedLayer) {
+          currentHighlightedLayer.forEach(layer => setBlockHighlight(layer, false));
+        }
+        if (blockName) {
+          const layers = blockLayers[blockName];
+          if (layers) {
+            currentHighlightedLayer = layers;
+            layers.forEach(layer => {
+              setBlockHighlight(layer, true);
+              map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 19 });
+              layer.openPopup();
+            });
+          }
+        }
+      }
+
+      // Function to get directions from user location to a block
+      function getDirections(from, to) {
+        if (routingControl) {
+          map.removeControl(routingControl);
+        }
+        const isInside = checkIfInsideCemetery(from);
+        routingControl = L.Routing.control({
+          waypoints: [ from, to ],
+          routeWhileDragging: true,
+          showAlternatives: true,
+          fitSelectedRoutes: false,
+          show: !isInside,
+          collapsible: true,
+          altLineOptions: {
+            styles: [
+              {color: 'black', opacity: 0.15, weight: 9},
+              {color: 'white', opacity: 0.8, weight: 6},
+              {color: 'blue', opacity: 0.5, weight: 2}
+            ]
+          },
+          createMarker: (i, wp, nWps) => {
+            if (i === 0) {
+              return L.marker(wp.latLng, {
+                icon: L.icon({
+                  iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
+                  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34],
+                  shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
+                  shadowSize: [41, 41]
+                })
+              });
+            } else {
+              return L.marker(wp.latLng, {
+                icon: L.icon({
+                  iconUrl: 'images/red-map-marker.png',
+                  iconSize: [20, 30], iconAnchor: [10, 30],
+                })
+              });
+            }
+          }
+        }).addTo(map);
+      }
+
+      // Load the cemetery data
+      fetch('map/cemetery.json')
+        .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
         .then(data => {
-          // Add the white cemetery outline
           cemeteryLayer = L.geoJSON(data, {
-            style: function () {
-              return {
-                color: "#FFFFFF",
-                weight: 2,
-                fillColor: "#FFFFFF",
-                fillOpacity: 1,
-              };
-            },
-            onEachFeature: function (feature, layer) {
-              if (feature.properties && feature.properties.name) {
-                layer.bindPopup(feature.properties.name);
-              }
-            },
+            style: () => ({ color: "#FFFFFF", weight: 2, fillColor: "#FFFFFF", fillOpacity: 1 }),
+            onEachFeature: (feature, layer) => feature.properties && feature.properties.name && layer.bindPopup(feature.properties.name),
           }).addTo(map);
-          
           checkAllDataLoaded();
         })
         .catch(error => {
@@ -370,24 +431,10 @@
 
       // Load the blocks data
       fetch('map/blocks.json')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
+        .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
         .then(data => {
-          // Add unique block names to the dropdown
-          const blockNames = new Set();
-          data.features.forEach(feature => {
-            if (feature.properties && feature.properties.name) {
-              blockNames.add(feature.properties.name);
-            }
-          });
-          
-          const blockSearch = document.getElementById('block-search');
-          
-          // Sort block names and add to dropdown
+          const blockNames = new Set(data.features.map(feature => feature.properties && feature.properties.name).filter(name => name));
+          const blockSearch = $('block-search');
           Array.from(blockNames).sort().forEach(name => {
             const option = document.createElement('option');
             option.value = name;
@@ -395,45 +442,32 @@
             blockSearch.appendChild(option);
           });
 
-          // Add the green blocks
-          const blocksLayer = L.geoJSON(data, {
-            style: function () {
-              return {
-                color: "#228B22", // Forest Green for outline
-                weight: 1,
-                fillColor: "#32CD32", // Lime Green for fill
-                fillOpacity: 0.6,
-              };
-            },
-            onEachFeature: function (feature, layer) {
+          L.geoJSON(data, {
+            style: () => ({ color: "#228B22", weight: 1, fillColor: "#32CD32", fillOpacity: 0.6 }),
+            onEachFeature: (feature, layer) => {
               if (feature.properties && feature.properties.name) {
-                // Store reference to this layer
-                if (!blockLayers[feature.properties.name]) {
-                  blockLayers[feature.properties.name] = [];
-                }
-                blockLayers[feature.properties.name].push(layer);
-                
-                // Add popup
-                layer.bindPopup(feature.properties.name);
-                
-                // Add click event to highlight block and get directions
-                layer.on('click', function() {
-                  highlightBlock(feature.properties.name);
-                  // Update the dropdown selection
-                  document.getElementById('block-search').value = feature.properties.name;
-                  // Get directions if user location is available
+                const name = feature.properties.name;
+                if (!blockLayers[name]) blockLayers[name] = [];
+                blockLayers[name].push(layer);
+                layer.bindPopup(name);
+                layer.on('click', () => {
+                  highlightBlock(name);
+                  $('block-search').value = name;
                   if (userLocation) {
                     getDirections(userLocation, layer.getBounds().getCenter());
+                    map.setView(userLocation, 18); // Center on user location at zoom 18
                   } else {
-                    getUserLocation(function() {
-                      getDirections(userLocation, layer.getBounds().getCenter());
+                    map.locate({setView: false, maxZoom: 18});
+                    map.once('locationfound', (e) => {
+                       userLocation = e.latlng;
+                       getDirections(userLocation, layer.getBounds().getCenter());
+                       map.setView(userLocation, 18); // Center on user location at zoom 18 after finding it
                     });
                   }
                 });
               }
             },
           }).addTo(map);
-          
           checkAllDataLoaded();
         })
         .catch(error => {
@@ -442,292 +476,99 @@
           hideLoader();
         });
 
-      // Function to check if a point is inside the cemetery polygon
-      function checkIfInsideCemetery(latLng) {
-        if (!cemeteryLayer) return false;
-        
-        // Use leaflet-pip to check if point is inside polygon
-        const results = leafletPip.pointInLayer(
-          [latLng.lng, latLng.lat],
-          cemeteryLayer,
-          true
-        );
-        
-        isInsideCemetery = results && results.length > 0;
-        
-        // Update user status display
-        const userStatus = document.getElementById('user-status');
-        userStatus.style.display = 'block';
-        
-        if (isInsideCemetery) {
-          userStatus.innerHTML = '✓ You are inside the cemetery';
-          userStatus.className = 'user-status inside-cemetery';
-          
-          // Hide directions container if inside cemetery
-          document.getElementById('directions-container').style.display = 'none';
-        } else {
-          userStatus.innerHTML = 'ℹ️ You are outside the cemetery';
-          userStatus.className = 'user-status outside-cemetery';
-          
-          // Show directions container if outside cemetery
-          document.getElementById('directions-container').style.display = 'block';
-        }
-        
-        return isInsideCemetery;
-      }
-
-      // Function to highlight a selected block
-      function highlightBlock(blockName) {
-        // Reset previous highlighted layer if exists
-        if (currentHighlightedLayer) {
-          currentHighlightedLayer.forEach(layer => {
-            layer.setStyle({
-              color: "#228B22",
-              weight: 1,
-              fillColor: "#32CD32",
-              fillOpacity: 0.6,
-            });
-          });
-        }
-        
-        // If a block is selected (not the default option)
-        if (blockName) {
-          const layers = blockLayers[blockName];
-          if (layers) {
-            // Set current highlighted layer
-            currentHighlightedLayer = layers;
-            
-            // Apply highlight style to all layers with this name
-            layers.forEach(layer => {
-              layer.setStyle({
-                color: "#FF4500", // OrangeRed for outline
-                weight: 3,
-                fillColor: "#FFA500", // Orange for fill
-                fillOpacity: 0.7,
-              });
-              
-              // Bring to front
-              layer.bringToFront();
-              
-              // Zoom to the block
-              map.fitBounds(layer.getBounds(), {
-                padding: [50, 50],
-                maxZoom: 19
-              });
-              
-              // Open the popup
-              layer.openPopup();
-            });
-          }
-        }
-      }
-
-      // Function to get user's current location
-      function getUserLocation(callback) {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            function(position) {
-              userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
-              
-              // Remove existing marker if any
-              if (userMarker) {
-                map.removeLayer(userMarker);
-              }
-              
-              // Add marker for user location
-              userMarker = L.marker(userLocation, {
-                icon: L.icon({
-                  iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-                  iconSize: [25, 41],
-                  iconAnchor: [12, 41],
-                  popupAnchor: [1, -34],
-                  shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-                  shadowSize: [41, 41]
-                })
-              }).addTo(map);
-              userMarker.bindPopup("You are here").openPopup();
-              
-              // Zoom to user location
-              map.setView(userLocation, 18);
-              
-              // Check if user is inside cemetery
-              checkIfInsideCemetery(userLocation);
-              
-              // Hide any previous errors
-              document.getElementById('location-error').style.display = 'none';
-              
-              // Execute callback if provided
-              if (callback && typeof callback === 'function') {
-                callback();
-              }
-            },
-            function(error) {
-              console.error('Error getting user location:', error);
-              document.getElementById('location-error').style.display = 'block';
-              setTimeout(function() {
-                document.getElementById('location-error').style.display = 'none';
-              }, 5000);
-            }
-          );
-        } else {
-          console.error('Geolocation is not supported by this browser.');
-          document.getElementById('location-error').style.display = 'block';
-          setTimeout(function() {
-            document.getElementById('location-error').style.display = 'none';
-          }, 5000);
-        }
-      }
-
-      // Function to get directions from user location to a block
-      function getDirections(from, to) {
-        // Remove existing routing control if any
-        if (routingControl) {
-          map.removeControl(routingControl);
-        }
-        
-        // Check if user is inside cemetery
-        const isInside = checkIfInsideCemetery(from);
-        
-        // Create the directions container element
-        const directionsContainer = document.getElementById('directions-container');
-        
-        // Create new routing control
-        routingControl = L.Routing.control({
-          waypoints: [
-            from,
-            to
-          ],
-          routeWhileDragging: true,
-          showAlternatives: true,
-          fitSelectedRoutes: false,
-          // Only show the directions panel if the user is outside the cemetery
-          show: !isInside,
-          collapsible: true,
-          altLineOptions: {
-            styles: [
-              {color: 'black', opacity: 0.15, weight: 9},
-              {color: 'white', opacity: 0.8, weight: 6},
-              {color: 'blue', opacity: 0.5, weight: 2}
-            ]
-          },
-          createMarker: function(i, wp, nWps) {
-            if (i === 0) {
-              // Use a blue marker for the start point (user location)
-              return L.marker(wp.latLng, {
-                icon: L.icon({
-                  iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-                  iconSize: [25, 41],
-                  iconAnchor: [12, 41],
-                  popupAnchor: [1, -34],
-                  shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-                  shadowSize: [41, 41]
-                })
-              });
-            } else {
-              // Use a red marker for the destination (block)
-              return L.marker(wp.latLng, {
-                icon: L.icon({
-                  iconUrl: 'images/red-map-marker.png',
-                  iconSize: [20, 30],
-                  iconAnchor: [10, 30],
-                })
-              });
-            }
-          }
-        }).addTo(map);
-      }
-
       // Add event listener for the dropdown
-      document.getElementById('block-search').addEventListener('change', function() {
+      $('block-search').addEventListener('change', function() {
         const selectedBlock = this.value;
         highlightBlock(selectedBlock);
-        
-        // Get directions if user location is available and a block is selected
-        if (selectedBlock && userLocation) {
+        if (selectedBlock) {
           const layers = blockLayers[selectedBlock];
           if (layers && layers.length > 0) {
-            getDirections(userLocation, layers[0].getBounds().getCenter());
+             const destination = layers[0].getBounds().getCenter();
+             if (userLocation) {
+                getDirections(userLocation, destination);
+                map.setView(userLocation, 18); // Center on user location at zoom 18 after selecting block from dropdown
+             } else {
+                map.locate({setView: false, maxZoom: 18});
+                map.once('locationfound', (e) => {
+                   userLocation = e.latlng;
+                   getDirections(userLocation, destination);
+                   map.setView(userLocation, 18); // Center on user location at zoom 18 after finding it
+                });
+             }
           }
-        } else if (selectedBlock) {
-          // If user location is not available, try to get it first
-          getUserLocation(function() {
+        }
+      });
+
+
+      // Implement Leaflet's default locate control functionality
+      $('location-button').addEventListener('click', () => {
+          map.locate({setView: true, maxZoom: 18});
+      });
+
+      // Handle location found event
+      map.on('locationfound', function(e) {
+          userLocation = e.latlng;
+          if (userMarker) map.removeLayer(userMarker);
+
+          userMarker = L.marker(userLocation, {
+              icon: L.icon({
+                  iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
+                  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34],
+                  shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
+                  shadowSize: [41, 41]
+              })
+          }).addTo(map);
+          userMarker.bindPopup("You are here").openPopup();
+
+          checkIfInsideCemetery(userLocation);
+          hide($('location-error'));
+
+          // Explicitly set view to user location at zoom 18 when location is found via the button
+          map.setView(userLocation, 18);
+
+          const selectedBlock = $('block-search').value;
+          if (selectedBlock) {
             const layers = blockLayers[selectedBlock];
             if (layers && layers.length > 0) {
               getDirections(userLocation, layers[0].getBounds().getCenter());
             }
-          });
-        }
-      });
-
-      // Add event listener for the location button
-      document.getElementById('location-button').addEventListener('click', function() {
-        getUserLocation();
-      });
-
-      // Watch for location changes
-      if (navigator.geolocation) {
-        var watchId = navigator.geolocation.watchPosition(
-          function(position) {
-            const newLocation = L.latLng(position.coords.latitude, position.coords.longitude);
-            
-            // Update user location
-            userLocation = newLocation;
-            
-            // Update marker position
-            if (userMarker) {
-              userMarker.setLatLng(newLocation);
-            } else {
-              userMarker = L.marker(newLocation, {
-                icon: L.icon({
-                  iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-                  iconSize: [25, 41],
-                  iconAnchor: [12, 41],
-                  popupAnchor: [1, -34],
-                  shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-                  shadowSize: [41, 41]
-                })
-              }).addTo(map);
-              userMarker.bindPopup("You are here");
-            }
-            
-            // Check if user crossed cemetery boundary
-            const wasInside = isInsideCemetery;
-            const nowInside = checkIfInsideCemetery(newLocation);
-            
-            // If the user's inside/outside status changed and there's an active route
-            if (wasInside !== nowInside && routingControl) {
-              // Recalculate the route with updated settings
-              const currentWaypoints = routingControl.getWaypoints();
-              if (currentWaypoints && currentWaypoints.length >= 2 && 
-                  currentWaypoints[0].latLng && currentWaypoints[1].latLng) {
-                getDirections(newLocation, currentWaypoints[1].latLng);
-              }
-            }
-          },
-          function(error) {
-            console.error('Error watching position:', error);
-          },
-          {
-            enableHighAccuracy: true,
-            maximumAge: 10000,
-            timeout: 10000
           }
-        );
-      }
+      });
+
+      // Handle location error event
+      map.on('locationerror', function(e) {
+          console.error('Location access denied or error:', e.message);
+          showLocationError();
+          removeUserStatus();
+          hide($('directions-container'));
+          if (userMarker) {
+              map.removeLayer(userMarker);
+              userMarker = null;
+          }
+      });
 
       // Add a legend
-      var legend = L.control({ position: "bottomright" });
-
+      const legend = L.control({ position: "bottomright" });
       legend.onAdd = function (map) {
-        var div = L.DomUtil.create("div", "legend");
-        div.innerHTML +=
-          '<i style="background: #FFFFFF; border: 1px solid #999"></i> Cemetery Boundary<br>';
+        const div = L.DomUtil.create("div", "legend");
+        div.innerHTML += '<i style="background: #FFFFFF; border: 1px solid #999"></i> Cemetery Boundary<br>';
         div.innerHTML += '<i style="background: #32CD32"></i> Block Areas<br>';
         div.innerHTML += '<i style="background: #FFA500; border: 2px solid #FF4500"></i> Selected Block<br>';
         return div;
       };
-
       legend.addTo(map);
+
+      // Initial fade in
+      window.addEventListener('DOMContentLoaded', fadeInBody);
+
+      // Fade out on link click
+      document.querySelectorAll('a.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          fadeOutBody(this.href);
+        });
+      });
+
     </script>
   </body>
 </html>

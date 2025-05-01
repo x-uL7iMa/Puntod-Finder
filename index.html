@@ -1,220 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Puntod Finder - San Pedro Bautista Memorial Park II</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: url("images/background.png") no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
-      text-shadow: .3rem .3rem .5rem #000;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-    body.fade-out {
-      opacity: 0;
-    }
-    body.fade-in {
-      opacity: 1;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 2.5rem;
-      background-color: #3f6a5400;
-      color: white;
-      height: 2rem;
-      flex-shrink: 0;
-    }
-    .header-logo {
-      display: flex;
-      align-items: center;
-    }
-    .header-logo img {
-      height: 5rem;
-      margin-right: 1rem;
-    }
-    .header-nav {
-      display: flex;
-      align-items: center;
-      gap: 7.5rem;
-      margin-right: 2rem;
-    }
-    .nav-link {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: white;
-      font-weight: bold;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .nav-link img {
-      height: 2.5rem;
-      width: 2.5rem;
-      
-    }
-    .nav-tooltip {
-      visibility: hidden;
-      opacity: 0;
-      position: absolute;
-      bottom: -1.8rem;
-      background-color: #3f6a54;
-      padding: 2px 6px;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-      font-size: 1rem;
-      transform: translateY(5px);
-    }
-    .nav-link:hover .nav-tooltip {
-      visibility: visible;
-      opacity: 1;
-      transform: translateY(0px);
-    }
-    .nav-link::before {
-      content: '';
-      position: absolute;
-      top: 0.0625rem; /* 1px */
-      left: 0.25rem;  /* .25rem */
-      width: 100%;
-      height: 100%;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      filter: blur(2px);
-      opacity: 0.4;
-      z-index: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Puntod Finder - San Pedro Bautista Memorial Park II</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url("images/background.png") no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            text-shadow: .3rem .3rem .5rem #000;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        body.fade-out {
+            opacity: 0;
+        }
+        body.fade-in {
+            opacity: 1;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 2.5rem; /* Desktop padding */
+            background-color: #3f6a5400;
+            color: white;
+            height: 2rem;
+            flex-shrink: 0;
+        }
+        .header-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none; /* Added style for link */
+            color: white; /* Added style for link */
+        }
+        .header-logo img {
+            height: 5rem; /* Desktop logo height */
+            margin-right: 1rem;
+        }
+        .header-logo h2 { /* Style for the h2 inside .header-logo */
+             font-size: 3rem; /* Desktop font size */
+             margin: 0;
+        }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 7.5rem; /* Desktop gap */
+            margin-right: 2rem;
+        }
+        .nav-link {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .nav-link img {
+            height: 2.5rem; /* Desktop icon size */
+            width: 2.5rem; /* Desktop icon size */
+        }
+        .nav-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: -1.8rem;
+            background-color: #3f6a54;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 1rem;
+            transform: translateY(5px);
+        }
+        .nav-link:hover .nav-tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0px);
+        }
+        /* Existing ::before styles for icons - keep as is for PC */
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0.0625rem; /* 1px */
+            left: 0.25rem;  /* .25rem */
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: blur(2px);
+            opacity: 0.4;
+            z-index: 0;
+        }
 
-    .nav-link[href*="about"]::before {
-      background-image: url('images/about-us.png');
-    }
+        .nav-link[href*="about"]::before {
+            background-image: url('images/about-us.png');
+        }
 
-    .nav-link[href*="contact"]::before {
-      background-image: url('images/contact-us.png');
-    }
+        .nav-link[href*="contact"]::before {
+            background-image: url('images/contact-us.png');
+        }
 
-    .nav-link[href*="admin"]::before {
-      background-image: url('images/administrator.png');
-    }
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start; /* move content to start */
-      align-items: center;
-      padding: 100px 20px 40px; /* top padding to push it up */
-      text-align: center;
-    }
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-    }
-    p {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-    }
-    .view-map-link {
-      display: inline-block;
-      padding: 1.5rem 4rem;
-      background-color: #3f6a54;
-      color: white;
-      border-radius: 50px;
-      text-decoration: none;
-      font-size: 2rem;
-      transition: background-color 0.3s;
-      margin-top: 7.5rem;
-    }
-    .view-map-link:hover {
-      background-color: #1a252f;
-    }
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      background-color: rgba(0, 0, 0, 0.4);
-    }
+        .nav-link[href*="admin"]::before {
+            background-image: url('images/administrator.png');
+        }
 
-    @media (max-width: 600px) {
-      header {
-        padding: 8px 15px;
-      }
-      .header-nav {
-        gap: 20px;
-      }
-      h1 {
-        font-size: 1.8rem;
-      }
-      p {
-        font-size: 1rem;
-      }
-      .view-map-link {
-        padding: 0.7rem 1.5rem;
-        font-size: 0.9rem;
-      }
-    }
-  </style>
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* move content to start */
+            align-items: center;
+            padding: 100px 20px 40px; /* Desktop padding */
+            text-align: center;
+        }
+        h1 {
+            font-size: 150px; /* Desktop font size */
+            margin-bottom: 0.5rem;
+        }
+        p {
+            font-size: 1.2rem; /* Desktop font size */
+            margin-bottom: 2rem;
+        }
+        .view-map-link {
+            display: inline-block;
+            padding: 1.5rem 4rem; /* Desktop padding */
+            background-color: #3f6a54;
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 2rem; /* Desktop font size */
+            transition: background-color 0.3s;
+            margin-top: 7.5rem; /* Desktop margin */
+        }
+        .view-map-link:hover {
+            background-color: #1a252f;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* --- Responsive Styles for Phones (Inline Header) --- */
+        @media (max-width: 768px) { /* Adjust breakpoint as needed */
+            header {
+                padding: 10px 15px; /* Reduced padding */
+                height: auto;
+                /* Keep display: flex, justify-content: space-between, align-items: center */
+            }
+
+            .header-logo {
+                 /* Keep display: flex, align-items: center */
+                 margin-right: 10px; /* Add some space between logo and nav */
+                 flex-shrink: 0; /* Prevent logo from shrinking too much */
+            }
+
+            .header-logo img {
+                height: 2.5rem; /* Much smaller logo height for inline fit */
+                margin-right: 0.5rem; /* Reduced margin */
+            }
+
+             .header-logo h2 {
+                 font-size: 1.4rem; /* Much smaller heading size */
+                 /* May need to adjust line-height if text wraps */
+             }
+
+            .header-nav {
+                gap: 15px; /* Much smaller gap between nav items */
+                margin-right: 0;
+                /* Keep display: flex, align-items: center */
+                flex-wrap: wrap; /* Allow nav items to wrap if space is tight */
+                justify-content: flex-end; /* Align nav items to the right */
+            }
+
+            .nav-link {
+                 font-size: 9px; /* Smaller font for nav text */
+            }
+
+            .nav-link img {
+                height: 1.5rem; /* Much smaller icon size */
+                width: 1.5rem; /* Much smaller icon size */
+            }
+
+            .nav-tooltip {
+                /* Hide tooltips on small screens */
+                visibility: hidden;
+                opacity: 0;
+                display: none;
+            }
+
+             /* Adjustments for the ::before pseudo-element on mobile */
+            .nav-link::before {
+                 top: 0;
+                 left: 0;
+                 filter: none;
+                 opacity: 0.6;
+                 height: 100%;
+                 width: 100%;
+            }
+
+
+            main {
+                padding: 50px 20px 30px; /* Reduced padding */
+                justify-content: center;
+            }
+            h1 {
+                font-size: 2.8rem; /* Reduced font size */
+                margin-bottom: 1rem;
+            }
+            p {
+                font-size: 1rem; /* Reduced font size */
+                margin-bottom: 2rem;
+            }
+            .view-map-link {
+                padding: 0.8rem 2rem; /* Reduced padding */
+                font-size: 1.2rem; /* Reduced font size */
+                margin-top: 2rem; /* Reduced margin */
+            }
+
+            footer {
+                padding: 0.7rem;
+                font-size: 0.8rem;
+            }
+        }
+
+         /* Further adjustments for very small screens */
+        @media (max-width: 480px) {
+             header {
+                 padding: 8px 10px;
+             }
+             .header-logo img {
+                 height: 2rem; /* Even smaller logo */
+             }
+             .header-logo h2 {
+                 font-size: 1.2rem; /* Even smaller heading */
+             }
+             .header-nav {
+                 gap: 10px; /* Even smaller gap */
+             }
+             .nav-link img {
+                 height: 1.2rem; /* Even smaller icons */
+                 width: 1.2rem;
+             }
+             .nav-link {
+                 font-size: 8px;
+             }
+             h1 {
+                 font-size: 2.2rem;
+             }
+             p {
+                 font-size: 0.9rem;
+             }
+             .view-map-link {
+                 padding: 0.6rem 1.5rem;
+                 font-size: 1rem;
+             }
+        }
+    </style>
 </head>
 <body class="fade-out">
 <header>
-  <a href="index.html" class="header-logo" style="text-decoration: none; color: white;">
-    <img src="images/Puntod%20Finder%20Logo.png" alt="Puntod Finder Logo">
-    <h2 style="font-size: 3rem; margin: 0;">Puntod Finder</h2>
-  </a>
-  <nav class="header-nav">
-    <a class="nav-link" href="admin.html">
-      <img src="images/administrator.png" alt="Admin Icon">
-      <span class="nav-tooltip">Admin</span>
+    <a href="index.html" class="header-logo">
+        <img src="images/Puntod%20Finder%20Logo.png" alt="Puntod Finder Logo">
+        <h2>Puntod Finder</h2>
     </a>
-    <a class="nav-link" href="about.html">
-      <img src="images/about-us.png" alt="About Us Icon">
-      <span class="nav-tooltip">About Us</span>
-    </a>
-    <a class="nav-link" href="contact.html">
-      <img src="images/contact-us.png" alt="Contact Us Icon">
-      <span class="nav-tooltip">Contact Us</span>
-    </a>
-  </nav>
+    <nav class="header-nav">
+        <a class="nav-link" href="admin.html">
+            <img src="images/administrator.png" alt="Admin Icon">
+            <span class="nav-tooltip">Admin</span>
+        </a>
+        <a class="nav-link" href="about.html">
+            <img src="images/about-us.png" alt="About Us Icon">
+            <span class="nav-tooltip">About Us</span>
+        </a>
+        <a class="nav-link" href="contact.html">
+            <img src="images/contact-us.png" alt="Contact Us Icon">
+            <span class="nav-tooltip">Contact Us</span>
+        </a>
+    </nav>
 </header>
 
 <main>
-  <h1 style="font-size: 150px;">Puntod Finder</h1>
-  <p>Find your loved ones at San Pedro Bautista Memorial Park II</p>
-  <a href="map.html" class="view-map-link">View Map</a>
+    <h1>Puntod Finder</h1>
+    <p>Find your loved ones at San Pedro Bautista Memorial Park II</p>
+    <a href="map.html" class="view-map-link">View Map</a>
 </main>
 
 <footer>© 2025 Puntod Finder</footer>
 
 <script>
-  // Fade in on page load
-  window.addEventListener('DOMContentLoaded', () => {
-    document.body.classList.add('fade-in');
-    document.body.classList.remove('fade-out');
-  });
-
-  // Fade out on link click
-  document.querySelectorAll('a.nav-link, .view-map-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      const destination = this.href;
-      document.body.classList.remove('fade-in');
-      document.body.classList.add('fade-out');
-      setTimeout(() => {
-        window.location.href = destination;
-      }, 500); // matches CSS transition
+    // Fade in on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        document.body.classList.add('fade-in');
+        document.body.classList.remove('fade-out');
     });
-  });
+
+    // Fade out on link click
+    document.querySelectorAll('a.nav-link, .view-map-link, a.header-logo').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const isInternal = this.href.startsWith(window.location.origin) || this.href.startsWith('/') || !this.href;
+            const isFragment = this.hash;
+
+            if (isInternal && !isFragment) {
+                e.preventDefault();
+                const destination = this.href;
+                document.body.classList.remove('fade-in');
+                document.body.classList.add('fade-out');
+                setTimeout(() => {
+                    window.location.href = destination;
+                }, 500); // matches CSS transition
+            }
+        });
+    });
 </script>
 
 </body>
