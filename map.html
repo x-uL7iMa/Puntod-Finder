@@ -320,17 +320,6 @@
       // Show loader before fetching data
       showLoader();
 
-      // Counter to track when both data sets are loaded
-      let loadedDatasets = 0;
-      const totalDatasets = 2;
-
-      function checkAllDataLoaded() {
-        loadedDatasets++;
-        if (loadedDatasets === totalDatasets) {
-          hideLoader();
-        }
-      }
-
       // Function to check if a point is inside the cemetery polygon
       function checkIfInsideCemetery(latLng) {
         if (!cemeteryLayer) return false;
@@ -413,68 +402,131 @@
         }).addTo(map);
       }
 
-      // Load the cemetery data
-      fetch('map/cemetery.json')
-        .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
-        .then(data => {
-          cemeteryLayer = L.geoJSON(data, {
-            style: () => ({ color: "#FFFFFF", weight: 2, fillColor: "#FFFFFF", fillOpacity: 1 }),
-            onEachFeature: (feature, layer) => feature.properties && feature.properties.name && layer.bindPopup(feature.properties.name),
-          }).addTo(map);
-          checkAllDataLoaded();
-        })
-        .catch(error => {
-          console.error('Error loading cemetery data:', error);
-          alert('Error loading cemetery data. Please check the console for details.');
-          hideLoader();
+      // Process blocks data function
+      function processBlocksData(data) {
+        const blockNames = new Set(data.features
+          .map(feature => feature.properties && feature.properties.name)
+          .filter(name => name));
+          
+        const blockSearch = $('block-search');
+        Array.from(blockNames).sort().forEach(name => {
+          const option = document.createElement('option');
+          option.value = name;
+          option.textContent = name;
+          blockSearch.appendChild(option);
         });
 
-      // Load the blocks data
-      fetch('map/blocks.json')
-        .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
-        .then(data => {
-          const blockNames = new Set(data.features.map(feature => feature.properties && feature.properties.name).filter(name => name));
-          const blockSearch = $('block-search');
-          Array.from(blockNames).sort().forEach(name => {
-            const option = document.createElement('option');
-            option.value = name;
-            option.textContent = name;
-            blockSearch.appendChild(option);
-          });
-
-          L.geoJSON(data, {
-            style: () => ({ color: "#228B22", weight: 1, fillColor: "#32CD32", fillOpacity: 0.6 }),
-            onEachFeature: (feature, layer) => {
-              if (feature.properties && feature.properties.name) {
-                const name = feature.properties.name;
-                if (!blockLayers[name]) blockLayers[name] = [];
-                blockLayers[name].push(layer);
-                layer.bindPopup(name);
-                layer.on('click', () => {
-                  highlightBlock(name);
-                  $('block-search').value = name;
-                  if (userLocation) {
+        L.geoJSON(data, {
+          style: () => ({ color: "#228B22", weight: 1, fillColor: "#32CD32", fillOpacity: 0.6 }),
+          onEachFeature: (feature, layer) => {
+            if (feature.properties && feature.properties.name) {
+              const name = feature.properties.name;
+              if (!blockLayers[name]) blockLayers[name] = [];
+              blockLayers[name].push(layer);
+              layer.bindPopup(name);
+              layer.on('click', () => {
+                highlightBlock(name);
+                $('block-search').value = name;
+                if (userLocation) {
+                  getDirections(userLocation, layer.getBounds().getCenter());
+                  map.setView(userLocation, 18); // Center on user location at zoom 18
+                } else {
+                  map.locate({setView: false, maxZoom: 18});
+                  map.once('locationfound', (e) => {
+                    userLocation = e.latlng;
                     getDirections(userLocation, layer.getBounds().getCenter());
-                    map.setView(userLocation, 18); // Center on user location at zoom 18
-                  } else {
-                    map.locate({setView: false, maxZoom: 18});
-                    map.once('locationfound', (e) => {
-                       userLocation = e.latlng;
-                       getDirections(userLocation, layer.getBounds().getCenter());
-                       map.setView(userLocation, 18); // Center on user location at zoom 18 after finding it
-                    });
-                  }
-                });
-              }
-            },
-          }).addTo(map);
-          checkAllDataLoaded();
+                    map.setView(userLocation, 18); // Center on user location at zoom 18 after finding it
+                  });
+                }
+              });
+            }
+          },
+        }).addTo(map);
+      }
+
+      // Process cemetery data function
+      function processCemeteryData(data) {
+        cemeteryLayer = L.geoJSON(data, {
+          style: () => ({ color: "#FFFFFF", weight: 2, fillColor: "#FFFFFF", fillOpacity: 1 }),
+          onEachFeature: (feature, layer) => feature.properties && feature.properties.name && layer.bindPopup(feature.properties.name),
+        }).addTo(map);
+      }
+
+      // Optimized fetch method using Promise.all for parallel fetching
+      const fetchJsonWithCache = async (url) => {
+        // Try to get from cache first
+        const cacheKey = `puntod_finder_${url}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        
+        if (cachedData) {
+          try {
+            const { data, timestamp } = JSON.parse(cachedData);
+            // Check if cache is less than 1 day old
+            const oneDay = 24 * 60 * 60 * 1000;
+            if (Date.now() - timestamp < oneDay) {
+              console.log(`Using cached data for ${url}`);
+              return data;
+            }
+          } catch (e) {
+            console.warn("Cache parsing error:", e);
+            // Proceed with fetch if cache is invalid
+          }
+        }
+        
+        // Fetch fresh data if no valid cache exists
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          
+          const data = await response.json();
+          
+          // Save to cache with timestamp
+          localStorage.setItem(cacheKey, JSON.stringify({
+            data,
+            timestamp: Date.now()
+          }));
+          
+          return data;
+        } catch (error) {
+          console.error(`Error fetching ${url}:`, error);
+          throw error;
+        }
+      };
+
+      // Fetch both files in parallel with improved error handling
+      Promise.all([
+        fetchJsonWithCache('map/cemetery.json').catch(error => {
+          console.error('Failed to load cemetery data:', error);
+          return null;
+        }),
+        fetchJsonWithCache('map/blocks.json').catch(error => {
+          console.error('Failed to load blocks data:', error);
+          return null;
         })
-        .catch(error => {
-          console.error('Error loading blocks data:', error);
-          alert('Error loading blocks data. Please check the console for details.');
-          hideLoader();
-        });
+      ])
+      .then(([cemeteryData, blocksData]) => {
+        if (cemeteryData) {
+          processCemeteryData(cemeteryData);
+        } else {
+          console.error('Cemetery data could not be loaded');
+          alert('Error loading cemetery data. Please check your connection and try again.');
+        }
+        
+        if (blocksData) {
+          processBlocksData(blocksData);
+        } else {
+          console.error('Blocks data could not be loaded');
+          alert('Error loading blocks data. Please check your connection and try again.');
+        }
+        
+        // Hide loader once processing is complete, regardless of success or failure
+        hideLoader();
+      })
+      .catch(error => {
+        console.error('Fatal error loading map data:', error);
+        alert('Failed to load map data. Please check your connection and try again.');
+        hideLoader();
+      });
 
       // Add event listener for the dropdown
       $('block-search').addEventListener('change', function() {
@@ -498,7 +550,6 @@
           }
         }
       });
-
 
       // Implement Leaflet's default locate control functionality
       $('location-button').addEventListener('click', () => {
