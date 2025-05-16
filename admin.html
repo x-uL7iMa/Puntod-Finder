@@ -1343,23 +1343,29 @@
         function closeAddForm() { addFormModal.style.display = "none"; }
 
         function submitNewRecord() {
-            const newRecord = {
-                Name: addNameInput.value.trim(), Block: addBlockInput.value.trim(), Lot: addLotInput.value.trim(),
-                "Lot Owner": addLotOwnerInput.value.trim(),
-                "Date of Birth": addDOBInput.value, "Date of Death": addDODInput.value,
-            };
-            if (!newRecord.Name || !newRecord.Block || !newRecord.Lot) {
-                showGlobalMessage("Name, Block, and Lot are required.", "error"); return;
-            }
+    const newRecord = {
+        Name: addNameInput.value.trim(),
+        Block: addBlockInput.value.trim(),
+        Lot: addLotInput.value.trim(),
+        "Lot Owner": addLotOwnerInput.value.trim(),
+        "Date of Birth": addDOBInput.value,
+        "Date of Death": addDODInput.value,
+    };
+    // Allow submission if Block, Lot, and Lot Owner are all filled (Name is optional)
+    if (!newRecord.Block || !newRecord.Lot || !newRecord["Lot Owner"]) {
+        showGlobalMessage("Block, Lot, and Lot Owner are required.", "error");
+        return;
+    }
 
-            fetch(`${API_URL}?sheet=${RECORDS_SHEET}`, {
-                method: "POST", headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ data: newRecord }),
-            })
-            .then(res => { if (!res.ok) throw new Error('Failed to add record'); return res.json(); })
-            .then(() => { closeAddForm(); fetchRecords(); showGlobalMessage("Record added successfully.", "success"); })
-            .catch(err => { console.error("Add Record Error:", err); showGlobalMessage(`Error adding record: ${err.message}`, "error"); });
-        }
+    fetch(`${API_URL}?sheet=${RECORDS_SHEET}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: newRecord }),
+    })
+        .then(res => { if (!res.ok) throw new Error('Failed to add record'); return res.json(); })
+        .then(() => { closeAddForm(); fetchRecords(); showGlobalMessage("Record added successfully.", "success"); })
+        .catch(err => { console.error("Add Record Error:", err); showGlobalMessage(`Error adding record: ${err.message}`, "error"); });
+}
 
         function openEditForm(button) {
             const row = button.closest("tr");
@@ -1393,25 +1399,34 @@
         function closeEditForm() { editFormModal.style.display = "none"; }
 
         function submitEdit() {
-            const recordId = editRecordIdInput.value;
-            const updatedRecord = {
-                Name: editNameInput.value.trim(), Block: editBlockInput.value.trim(), Lot: editLotInput.value.trim(),
-                "Lot Owner": editLotOwnerInput.value.trim(),
-                "Date of Birth": editDOBInput.value, "Date of Death": editDODInput.value,
-            };
-            if (!updatedRecord.Name || !updatedRecord.Block || !updatedRecord.Lot) {
-                showGlobalMessage("Name, Block, and Lot are required.", "error"); return;
-            }
-            if (!recordId) { showGlobalMessage("Error: Unique ID missing for update.", "error"); return; }
+    const recordId = editRecordIdInput.value;
+    const updatedRecord = {
+        Name: editNameInput.value.trim(),
+        Block: editBlockInput.value.trim(),
+        Lot: editLotInput.value.trim(),
+        "Lot Owner": editLotOwnerInput.value.trim(),
+        "Date of Birth": editDOBInput.value,
+        "Date of Death": editDODInput.value,
+    };
+    // Allow update if Block, Lot, and Lot Owner are all filled (Name is optional)
+    if (!updatedRecord.Block || !updatedRecord.Lot || !updatedRecord["Lot Owner"]) {
+        showGlobalMessage("Block, Lot, and Lot Owner are required.", "error");
+        return;
+    }
+    if (!recordId) {
+        showGlobalMessage("Error: Unique ID missing for update.", "error");
+        return;
+    }
 
-            fetch(`${API_URL}/${ID_COLUMN_NAME}/${recordId}?sheet=${RECORDS_SHEET}`, {
-                method: "PUT", headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ data: updatedRecord }),
-            })
-            .then(res => { if (!res.ok) throw new Error('Failed to update record'); return res.json(); })
-            .then(() => { closeEditForm(); fetchRecords(); showGlobalMessage("Record updated successfully.", "success"); })
-            .catch(err => { console.error("Update Record Error:", err); showGlobalMessage(`Error updating record: ${err.message}`, "error"); });
-        }
+    fetch(`${API_URL}/${ID_COLUMN_NAME}/${recordId}?sheet=${RECORDS_SHEET}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: updatedRecord }),
+    })
+        .then(res => { if (!res.ok) throw new Error('Failed to update record'); return res.json(); })
+        .then(() => { closeEditForm(); fetchRecords(); showGlobalMessage("Record updated successfully.", "success"); })
+        .catch(err => { console.error("Update Record Error:", err); showGlobalMessage(`Error updating record: ${err.message}`, "error"); });
+}
 
         function deleteRecord() {
             const recordId = editRecordIdInput.value;
