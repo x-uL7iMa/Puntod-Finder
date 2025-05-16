@@ -505,8 +505,9 @@
             white-space: nowrap; /* Prevent status text wrapping */
         }
 
-        .status-occupied {
-            background-color: #e74c3c;
+        .status-purchased {
+            background-color: #007bff;
+            color: #fff;
         }
 
         .status-available {
@@ -888,8 +889,7 @@
                             <th>Block</th>
                             <th>Lot</th>
                             <th>Status</th>
-                            <th>Latitude</th>
-                            <th>Longitude</th>
+                            <th>Lot Owner</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -916,6 +916,7 @@
                             <th>Name <span class="sort-arrow" data-column="0">▼</span></th>
                             <th>Block <span class="sort-arrow" data-column="1">▼</span></th>
                             <th>Lot <span class="sort-arrow" data-column="2">▼</span></th>
+                            <th>Lot Owner <span class="sort-arrow" data-column="3">▼</span></th>
                             <th>Date of Birth</th>
                             <th>Date of Death</th>
                             <th class="edit-cell"></th> </tr>
@@ -962,6 +963,8 @@
                 <input type="text" id="addBlock" placeholder="Block" />
                 <label for="addLot">Lot</label>
                 <input type="text" id="addLot" placeholder="Lot" />
+                <label for="addLotOwner">Lot Owner</label>
+                <input type="text" id="addLotOwner" placeholder="Lot Owner" />
                 <label for="addDOB">Date of Birth</label>
                 <input type="date" id="addDOB" />
                 <label for="addDOD">Date of Death</label>
@@ -985,6 +988,8 @@
                 <input type="text" id="editBlock" placeholder="Block" />
                 <label for="editLot">Lot</label>
                 <input type="text" id="editLot" placeholder="Lot" />
+                <label for="editLotOwner">Lot Owner</label>
+                <input type="text" id="editLotOwner" placeholder="Lot Owner" />
                 <label for="editDOB">Date of Birth</label>
                 <input type="date" id="editDOB" />
                 <label for="editDOD">Date of Death</label>
@@ -1031,6 +1036,7 @@
         const addNameInput = document.getElementById("addName");
         const addBlockInput = document.getElementById("addBlock");
         const addLotInput = document.getElementById("addLot");
+        const addLotOwnerInput = document.getElementById("addLotOwner");
         const addDOBInput = document.getElementById("addDOB");
         const addDODInput = document.getElementById("addDOD");
 
@@ -1039,6 +1045,7 @@
         const editNameInput = document.getElementById("editName");
         const editBlockInput = document.getElementById("editBlock");
         const editLotInput = document.getElementById("editLot");
+        const editLotOwnerInput = document.getElementById("editLotOwner");
         const editDOBInput = document.getElementById("editDOB");
         const editDODInput = document.getElementById("editDOD");
 
@@ -1222,7 +1229,7 @@
         function displayRecords(data) {
             recordsTableBody.innerHTML = "";
             if (!Array.isArray(data) || data.length === 0) {
-                recordsTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No records found.</td></tr>`;
+                recordsTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No records found.</td></tr>`;
                 return;
             }
             data.forEach(record => {
@@ -1233,6 +1240,7 @@
                     <td>${record.Name || ''}</td>
                     <td>${record.Block || ''}</td>
                     <td>${record.Lot || ''}</td>
+                    <td>${record["Lot Owner"] || ''}</td>
                     <td>${record["Date of Birth"] || ''}</td>
                     <td>${record["Date of Death"] || ''}</td>
                     <td class="edit-cell"><button class="edit-button" onclick="openEditForm(this)">✏️</button></td>`;
@@ -1249,7 +1257,7 @@
             let rowsFound = 0;
 
             document.querySelectorAll("#recordsTable tbody tr").forEach(row => {
-                if (row.querySelectorAll('td').length < 6) { row.style.display = "none"; return; } // Skip info row
+                if (row.querySelectorAll('td').length < 7) { row.style.display = "none"; return; } // Skip info row
 
                 const name = row.children[0].textContent.toLowerCase();
                 const block = row.children[1].textContent.toLowerCase();
@@ -1273,7 +1281,7 @@
             currentSortColumn = columnIndex;
 
             const tbody = document.getElementById("recordsTable").querySelector("tbody");
-            const rows = Array.from(tbody.querySelectorAll("tr")).filter(row => row.querySelectorAll('td').length >= 6); // Filter data rows
+            const rows = Array.from(tbody.querySelectorAll("tr")).filter(row => row.querySelectorAll('td').length >= 7); // Filter data rows
 
             rows.sort((a, b) => {
                 const aText = a.children[columnIndex].textContent.trim().toLowerCase();
@@ -1304,6 +1312,7 @@
         function openAddForm() {
             addFormModal.style.display = "flex";
             addNameInput.value = ""; addBlockInput.value = ""; addLotInput.value = "";
+            addLotOwnerInput.value = "";
             addDOBInput.value = ""; addDODInput.value = "";
             showGlobalMessage('', ''); // Clear message
         }
@@ -1313,6 +1322,7 @@
         function submitNewRecord() {
             const newRecord = {
                 Name: addNameInput.value.trim(), Block: addBlockInput.value.trim(), Lot: addLotInput.value.trim(),
+                "Lot Owner": addLotOwnerInput.value.trim(),
                 "Date of Birth": addDOBInput.value, "Date of Death": addDODInput.value,
             };
             if (!newRecord.Name || !newRecord.Block || !newRecord.Lot) {
@@ -1337,8 +1347,9 @@
 
             editRecordIdInput.value = recordId;
             editNameInput.value = cells[0].textContent; editBlockInput.value = cells[1].textContent; editLotInput.value = cells[2].textContent;
-            editDOBInput.value = formatDateForInput(cells[3].textContent);
-            editDODInput.value = formatDateForInput(cells[4].textContent);
+            editLotOwnerInput.value = cells[3].textContent;
+            editDOBInput.value = formatDateForInput(cells[4].textContent);
+            editDODInput.value = formatDateForInput(cells[5].textContent);
 
             editFormModal.style.display = "flex";
             showGlobalMessage('', ''); // Clear message
@@ -1362,6 +1373,7 @@
             const recordId = editRecordIdInput.value;
             const updatedRecord = {
                 Name: editNameInput.value.trim(), Block: editBlockInput.value.trim(), Lot: editLotInput.value.trim(),
+                "Lot Owner": editLotOwnerInput.value.trim(),
                 "Date of Birth": editDOBInput.value, "Date of Death": editDODInput.value,
             };
             if (!updatedRecord.Name || !updatedRecord.Block || !updatedRecord.Lot) {
@@ -1403,17 +1415,17 @@
         function displayLotStatus(data) {
             lotStatusTableBody.innerHTML = "";
             if (!Array.isArray(data) || data.length === 0) {
-                lotStatusTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No lot status data found.</td></tr>`;
+                lotStatusTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No lot status data found.</td></tr>`;
                 return;
             }
             data.forEach(item => {
                 const row = document.createElement("tr");
-                const statusClass = item.Status && item.Status.toLowerCase() === "occupied" ? "status-occupied" : "status-available";
+                const statusClass = item.Status && item.Status.toLowerCase() === "purchased" ? "status-purchased" : "status-available";
                 row.innerHTML = `
                     <td>${item.Block || ''}</td>
                     <td>${item.Lot || ''}</td>
-                    <td class="status-cell ${statusClass}">${item.Status || 'Available'}</td> <td>${item.Latitude || ''}</td>
-                    <td>${item.Longitude || ''}</td>`;
+                    <td class="status-cell ${statusClass}">${item.Status || 'Available'}</td>
+                    <td>${item["Lot Owner"] || ''}</td>`;
                 lotStatusTableBody.appendChild(row);
             });
         }
@@ -1424,7 +1436,7 @@
             const statusFilter = document.getElementById("searchStatusLS").value.toLowerCase();
 
             document.querySelectorAll("#lotStatusTable tbody tr").forEach(row => {
-                if (row.querySelectorAll('td').length < 5) { row.style.display = "none"; return; } // Skip info row
+                if (row.querySelectorAll('td').length < 4) { row.style.display = "none"; return; } // Skip info row
 
                 const block = row.children[0].textContent.toLowerCase();
                 const lot = row.children[1].textContent.toLowerCase();
