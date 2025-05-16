@@ -81,6 +81,96 @@
         flex-direction: column;
         height: 93%;
       }
+      .left-panel {
+        position: absolute;
+        top: 110px;
+        left: 60px;
+        width: 260px;
+        max-width: 320px;
+        background: #f8f8f8;
+        border-radius: 8px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+        padding: 0 18px 18px 18px;
+        z-index: 1001;
+        display: none;
+        transition: box-shadow 0.2s, width 0.2s, left 0.2s, top 0.2s, height 0.2s;
+        overflow: visible;
+        border: 1px solid #ddd;
+      }
+      .left-panel.active {
+        display: block;
+      }
+      .left-panel .close-btn {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: #888;
+        cursor: pointer;
+        z-index: 1003;
+      }
+      .left-panel .close-btn:hover {
+        color: #e74c3c;
+      }
+      .left-panel h3 {
+        margin-top: 18px;
+        color: #3f6a54;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+      .left-panel .lots-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .left-panel .lots-table th, .left-panel .lots-table td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #e0e0e0;
+        text-align: left;
+        font-size: 15px;
+      }
+      .left-panel .lots-table th {
+        background: #e8f5e9;
+        color: #3f6a54;
+      }
+      .left-panel .lots-table td {
+        color: #333;
+      }
+      .left-panel .lots-table tr:last-child td {
+        border-bottom: none;
+      }
+      .left-panel .lots-table .available {
+        color: #27ae60;
+        font-weight: bold;
+      }
+      .left-panel .lots-table .occupied {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+      @media (max-width: 600px) {
+        .left-panel {
+          width: 98vw;
+          left: 1vw;
+          right: 1vw;
+          top: auto !important;
+          bottom: 70px;
+          max-width: none;
+          min-width: 0;
+          border-radius: 8px;
+          padding: 0 8px 12px 8px;
+        }
+        .lots-panel-toggle-btn {
+          left: 10px;
+          top: auto;
+          bottom: 130px;
+        }
+      }
+      /* Extra margin if directions panel is open (detected by class on body) */
+      body.directions-open .left-panel {
+        top: 180px;
+      }
       #map {
         flex: 1;
         width: 100%;
@@ -223,6 +313,34 @@
           gap: 20px;
         }
       }
+      .lots-panel-toggle-btn {
+        position: absolute;
+        left: 10px;
+        top: 185px; /* 40px below my location button (145px + 40px) */
+        z-index: 1000;
+        width: 34px;
+        height: 34px;
+        background: white;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        transition: background 0.2s;
+      }
+      .lots-panel-toggle-btn img {
+        width: 23.5px;
+        height: 23.5px;
+      }
+      .lots-panel-toggle-btn.open {
+        background: #3f6a54;
+      }
+      .lots-panel-toggle-btn.open img {
+        filter: invert(1);
+      }
     </style>
   </head>
   <body class="fade-out">
@@ -244,8 +362,12 @@
     </header>
 
     <div class="map-container">
-      <div id="loader" class="loader">Loading map data...</div>
       <div id="map"></div>
+      <button id="lots-panel-toggle-btn" class="lots-panel-toggle-btn" title="Show Available Lots">
+        <img id="lots-panel-toggle-icon" src="images/infoIcon.png" alt="Lots Panel">
+      </button>
+      <div id="available-lots-panel" class="left-panel"></div>
+      <div id="loader" class="loader">Loading map data...</div>
       <div class="search-container">
         <select id="block-search">
           <option value="">Select a Block...</option>
@@ -340,6 +462,10 @@
       let isInsideCemetery = false;
       const blockLayers = {};
       let currentHighlightedLayer = null;
+      const availableLotsPanel = document.getElementById('available-lots-panel');
+      const lotsPanelToggleBtn = document.getElementById('lots-panel-toggle-btn');
+      let lotsPanelOpen = false;
+      let lastBlockName = null;
 
       // Directly embedding the JSON data for cemetery
       const cemeteryData = {
@@ -654,6 +780,10 @@
               layer.openPopup();
             });
           }
+          lastBlockName = blockName;
+          if (lotsPanelOpen) showAvailableLotsPanel(blockName);
+        } else {
+          hideAvailableLotsPanel();
         }
       }
 
@@ -720,6 +850,8 @@
               layer.on('click', () => {
                 highlightBlock(name);
                 $('block-search').value = name;
+                lastBlockName = name;
+                if (lotsPanelOpen) showAvailableLotsPanel(name);
                 if (userLocation) {
                   getDirections(userLocation, layer.getBounds().getCenter());
                   map.setView(userLocation, 18); // Center on user location at zoom 18
@@ -764,6 +896,10 @@
                 });
              }
           }
+          lastBlockName = selectedBlock;
+          if (lotsPanelOpen) showAvailableLotsPanel(selectedBlock);
+        } else {
+          hideAvailableLotsPanel();
         }
       });
 
@@ -835,6 +971,101 @@
           fadeOutBody(this.href);
         });
       });
+
+      // --- Available Lots Panel Logic ---
+      function showAvailableLotsPanel(blockName) {
+        if (!blockName) {
+          availableLotsPanel.classList.remove('active');
+          availableLotsPanel.innerHTML = '';
+          lotsPanelOpen = false;
+          lotsPanelToggleBtn.classList.remove('open');
+          return;
+        }
+        lastBlockName = blockName;
+        availableLotsPanel.classList.add('active');
+        lotsPanelOpen = true;
+        lotsPanelToggleBtn.classList.add('open');
+        availableLotsPanel.innerHTML = `<button class='close-btn' onclick='hideAvailableLotsPanel()' title='Close'>&times;</button>
+          <h3>${blockName}</h3>
+          <div id='lots-panel-content'><div style='text-align:center; color:#888;'>Loading...</div></div>`;
+        fetch(`https://sheetdb.io/api/v1/ao4bw50h75c36?sheet=AvailableLots&Blocks=${encodeURIComponent(blockName)}`)
+          .then(res => res.json())
+          .then(data => {
+            const content = document.getElementById('lots-panel-content');
+            if (!data || !data.length) {
+              content.innerHTML = `<div style='color:#e74c3c;'>No data found for this block.</div>`;
+              return;
+            }
+            const lots = data[0];
+            content.innerHTML = `
+              <table class='lots-table'>
+                <tr><th>Total Lots</th><td>${lots["Total Lots"] || '-'}</td></tr>
+                <tr><th>Occupied Lots</th><td class='occupied'>${lots["Occupied Lots"] || '-'}</td></tr>
+                <tr><th>Available Lots</th><td class='available'>${lots["Available Lots"] || '-'}</td></tr>
+              </table>
+            `;
+            adjustLotsPanelPosition();
+          })
+          .catch(() => {
+            const content = document.getElementById('lots-panel-content');
+            content.innerHTML = `<div style='color:#e74c3c;'>Error loading data.</div>`;
+          });
+        adjustLotsPanelPosition();
+      }
+      function hideAvailableLotsPanel() {
+        availableLotsPanel.classList.remove('active');
+        availableLotsPanel.innerHTML = '';
+        lotsPanelOpen = false;
+        lotsPanelToggleBtn.classList.remove('open');
+      }
+      lotsPanelToggleBtn.addEventListener('click', function() {
+        if (lotsPanelOpen) {
+          hideAvailableLotsPanel();
+        } else {
+          // Show last selected block, or Block 01 by default
+          showAvailableLotsPanel(lastBlockName || 'Block 01');
+        }
+      });
+      // Dynamically adjust the lots panel position to avoid overlapping controls
+      function adjustLotsPanelPosition() {
+        if (window.innerWidth <= 600) {
+          availableLotsPanel.style.top = '';
+          availableLotsPanel.style.bottom = '70px';
+          availableLotsPanel.style.left = '1vw';
+          availableLotsPanel.style.right = '1vw';
+          return;
+        }
+        // Get bounding rects
+        const search = document.querySelector('.search-container');
+        const directions = document.getElementById('directions-container');
+        const zoom = document.querySelector('.leaflet-control-zoom');
+        let top = 110, left = 20;
+        if (zoom) {
+          const zoomRect = zoom.getBoundingClientRect();
+          top = Math.max(top, zoomRect.bottom + 10);
+          left = zoomRect.right + 10;
+        }
+        if (search) {
+          const searchRect = search.getBoundingClientRect();
+          // If panel would overlap search, move it down
+          if (top + availableLotsPanel.offsetHeight > searchRect.top) {
+            top = searchRect.bottom + 10;
+          }
+        }
+        if (directions && directions.offsetParent !== null) {
+          const dirRect = directions.getBoundingClientRect();
+          // If panel would overlap directions, move it below
+          if (top + availableLotsPanel.offsetHeight > dirRect.top) {
+            top = dirRect.bottom + 10;
+          }
+        }
+        availableLotsPanel.style.top = top + 'px';
+        availableLotsPanel.style.left = left + 'px';
+        availableLotsPanel.style.right = '';
+        availableLotsPanel.style.bottom = '';
+      }
+      // Re-adjust on resize
+      window.addEventListener('resize', adjustLotsPanelPosition);
     </script>
   </body>
 </html>
